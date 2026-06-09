@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">책속의 한줄</string>
-    <string name="tagline">책 속에서 만난 한 문장</string>
+    <string name="app_name">한줄기록</string>
+    <string name="tagline">독서 문장 담기</string>
 
     <!-- Navigation / titles -->
     <string name="title_home">내 서재</string>

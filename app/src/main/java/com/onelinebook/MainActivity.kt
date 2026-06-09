@@ -8,9 +8,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.onelinebook.data.prefs.Settings
+import com.onelinebook.ui.components.PaperBackground
+import com.onelinebook.ui.theme.ThemeMode
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavType
@@ -42,8 +45,15 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val settings by prefs.settings.collectAsStateWithLifecycle(initialValue = Settings())
+            val dark = when (settings.themeMode) {
+                ThemeMode.SYSTEM -> isSystemInDarkTheme()
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+            }
             OneLineBookTheme(themeMode = settings.themeMode) {
-                OneLineNavHost()
+                PaperBackground(dark = dark) {
+                    OneLineNavHost()
+                }
             }
         }
     }

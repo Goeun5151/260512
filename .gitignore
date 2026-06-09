@@ -1,12 +1,22 @@
-*.iml
-.gradle/
-/local.properties
-/.idea/
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+
+# capacitor / android build outputs
+/android/app/build/
+/android/build/
+/android/.gradle/
+/android/local.properties
+/android/app/release/
+/android/capacitor-cordova-android-plugins/
+
+# env
+.env*.local
+
+# misc
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
-app/build/
-build/
+*.pem
+npm-debug.log*

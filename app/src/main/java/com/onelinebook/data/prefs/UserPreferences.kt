@@ -12,9 +12,13 @@ import kotlinx.coroutines.flow.map
 
 private val Context.dataStore by preferencesDataStore(name = "settings")
 
+/** How the library is laid out on the home screen. */
+enum class ViewMode { LIST, GRID }
+
 /** Snapshot of user-configurable settings. */
 data class Settings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val viewMode: ViewMode = ViewMode.LIST,
     val dailyEnabled: Boolean = false,
     val dailyHour: Int = 8,
     val dailyMinute: Int = 0,
@@ -24,6 +28,7 @@ class UserPreferences(private val context: Context) {
 
     private object Keys {
         val THEME = stringPreferencesKey("theme_mode")
+        val VIEW_MODE = stringPreferencesKey("view_mode")
         val DAILY_ENABLED = booleanPreferencesKey("daily_enabled")
         val DAILY_HOUR = intPreferencesKey("daily_hour")
         val DAILY_MINUTE = intPreferencesKey("daily_minute")
@@ -33,6 +38,8 @@ class UserPreferences(private val context: Context) {
         Settings(
             themeMode = runCatching { ThemeMode.valueOf(p[Keys.THEME] ?: "SYSTEM") }
                 .getOrDefault(ThemeMode.SYSTEM),
+            viewMode = runCatching { ViewMode.valueOf(p[Keys.VIEW_MODE] ?: "LIST") }
+                .getOrDefault(ViewMode.LIST),
             dailyEnabled = p[Keys.DAILY_ENABLED] ?: false,
             dailyHour = p[Keys.DAILY_HOUR] ?: 8,
             dailyMinute = p[Keys.DAILY_MINUTE] ?: 0,
@@ -41,6 +48,10 @@ class UserPreferences(private val context: Context) {
 
     suspend fun setThemeMode(mode: ThemeMode) {
         context.dataStore.edit { it[Keys.THEME] = mode.name }
+    }
+
+    suspend fun setViewMode(mode: ViewMode) {
+        context.dataStore.edit { it[Keys.VIEW_MODE] = mode.name }
     }
 
     suspend fun setDailyEnabled(enabled: Boolean) {

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.onelinebook.data.local.Quote
 import com.onelinebook.data.prefs.UserPreferences
+import com.onelinebook.data.prefs.ViewMode
 import com.onelinebook.data.repository.QuoteRepository
 import com.onelinebook.data.repository.SortOrder
 import com.onelinebook.ui.theme.ThemeMode
@@ -29,7 +30,7 @@ data class HomeUiState(
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModel(
     private val repository: QuoteRepository,
-    userPreferences: UserPreferences,
+    private val userPreferences: UserPreferences,
 ) : ViewModel() {
 
     private val sortOrder = MutableStateFlow(SortOrder.LATEST)
@@ -39,6 +40,14 @@ class HomeViewModel(
     val themeMode: StateFlow<ThemeMode> = userPreferences.settings
         .map { it.themeMode }
         .stateIn(viewModelScope, SharingStarted.Eagerly, ThemeMode.SYSTEM)
+
+    val viewMode: StateFlow<ViewMode> = userPreferences.settings
+        .map { it.viewMode }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ViewMode.LIST)
+
+    fun setViewMode(mode: ViewMode) {
+        viewModelScope.launch { userPreferences.setViewMode(mode) }
+    }
 
     val uiState: StateFlow<HomeUiState> = combine(
         sortOrder.flatMapLatest { repository.observeQuotes(it) },

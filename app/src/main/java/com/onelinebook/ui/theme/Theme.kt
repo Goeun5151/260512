@@ -8,13 +8,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 private val LightColors = lightColorScheme(
-    primary = Clay,
-    onPrimary = Color(0xFFFFFDF8),
+    primary = Ink,
+    onPrimary = Color.White,
     primaryContainer = IvorySoft,
-    onPrimaryContainer = ClayDark,
-    secondary = Gold,
-    onSecondary = Ink,
-    tertiary = ClayDark,
+    onPrimaryContainer = Ink,
+    secondary = Ink,
+    onSecondary = Color.White,
+    tertiary = Ink,
     background = Ivory,
     onBackground = Ink,
     surface = CardWhite,
@@ -23,18 +23,18 @@ private val LightColors = lightColorScheme(
     onSurfaceVariant = InkSoft,
     outline = Line,
     outlineVariant = Line,
-    error = Color(0xFFB3403A),
+    error = Color(0xFF8E1F1F),
     onError = Color.White,
 )
 
 private val DarkColors = darkColorScheme(
-    primary = NightClay,
+    primary = NightText,
     onPrimary = NightBg,
     primaryContainer = NightSurface,
-    onPrimaryContainer = NightClay,
-    secondary = NightGold,
+    onPrimaryContainer = NightText,
+    secondary = NightText,
     onSecondary = NightBg,
-    tertiary = NightGold,
+    tertiary = NightText,
     background = NightBg,
     onBackground = NightText,
     surface = NightCard,
@@ -43,7 +43,7 @@ private val DarkColors = darkColorScheme(
     onSurfaceVariant = NightTextSoft,
     outline = NightLine,
     outlineVariant = NightLine,
-    error = Color(0xFFE8918B),
+    error = Color(0xFFE0A0A0),
     onError = NightBg,
 )
 

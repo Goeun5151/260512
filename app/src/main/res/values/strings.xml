@@ -63,6 +63,8 @@
 
     <!-- Misc -->
     <string name="fab_add">한줄 추가</string>
+    <string name="view_list">리스트 보기</string>
+    <string name="view_grid">그리드 보기</string>
     <string name="cd_favorite">즐겨찾기</string>
     <string name="cd_back">뒤로</string>
     <string name="unknown_book">제목 미상</string>

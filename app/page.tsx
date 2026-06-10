@@ -103,7 +103,7 @@ export default function Page() {
           <div>
             <h1 className="text-2xl font-bold tracking-tight">독서기록</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              책 속 문장을 모아두고, 매일 다시 꺼내 보는 곳
+              독서로 SNS하세요
             </p>
           </div>
           <DropdownMenu>

@@ -14,11 +14,11 @@ import {
 import { cn } from '@/lib/utils'
 
 const SAMPLE = {
-  sentence: '사람은 자신이 본 것만큼만 세상을 이해한다.',
-  bookTitle: '데미안',
-  author: '헤르만 헤세',
-  chapter: '3장',
-  page: '87',
+  sentence: '우리가 듣는 모든 것은 사실이 아니라 의견일 뿐이며, 우리가 보는 모든 것은 진실이 아니라 관점일 뿐이다.',
+  bookTitle: '명상록',
+  author: '마르쿠스 아우렐리우스',
+  chapter: '2권',
+  page: '11',
   cover: '/placeholder.svg',
 }
 

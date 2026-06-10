@@ -17,14 +17,12 @@ const PUB_KEY = 'hanjul-shared-pub-v1'
 const LIKE_KEY = 'hanjul-shared-likes-v1'
 
 const SEED: SharedQuote[] = [
-  { id: 's1', sentence: '우리가 어떤 일을 끝까지 해내는 건, 그 일을 사랑하기 때문이다.', bookTitle: '몰입', author: '황농문', likes: 128 },
-  { id: 's2', sentence: '사람은 자신이 본 것만큼만 세상을 이해한다.', bookTitle: '데미안', author: '헤르만 헤세', likes: 342 },
-  { id: 's3', sentence: '오늘 걷지 않으면 내일은 뛰어야 한다.', bookTitle: '언어의 온도', author: '이기주', likes: 211 },
-  { id: 's4', sentence: '어떻게 사느냐는 결국 무엇을 기억하느냐의 문제다.', bookTitle: '파친코', author: '이민진', likes: 97 },
+  { id: 's1', sentence: '우리의 최고와 최악의 모습을 다 봤으면서도 똑같이 아껴주는 사람들을 위하여.', bookTitle: 'A Crown for Christmas', author: '', likes: 312 },
+  { id: 's2', sentence: '네 인생을 흔들 만한 사람이 아니면 흘려보내라.', bookTitle: '', author: '', likes: 287 },
+  { id: 's3', sentence: '어제의 비로 오늘을 적실 필요 없듯이, 내일의 비 때문에 오늘 우산을 펼 필요는 없다.', bookTitle: '', author: '', likes: 198 },
+  { id: 's4', sentence: '우리가 듣는 모든 것은 사실이 아니라 의견일 뿐이며, 우리가 보는 모든 것은 진실이 아니라 관점일 뿐이다.', bookTitle: '명상록', author: '마르쿠스 아우렐리우스', likes: 421 },
   { id: 's5', sentence: '행복은 강도가 아니라 빈도다.', bookTitle: '굿 라이프', author: '최인철', likes: 256 },
-  { id: 's6', sentence: '좋은 문장은 다시 읽고 싶어진다.', bookTitle: '미움받을 용기', author: '기시미 이치로', likes: 180 },
-  { id: 's7', sentence: '삶이 있는 한 희망은 있다.', bookTitle: '', author: '키케로', likes: 401 },
-  { id: 's8', sentence: '내일은 내일의 태양이 뜬다.', bookTitle: '바람과 함께 사라지다', author: '마거릿 미첼', likes: 150 },
+  { id: 's6', sentence: '사람은 자신이 본 것만큼만 세상을 이해한다.', bookTitle: '데미안', author: '헤르만 헤세', likes: 342 },
 ]
 
 function loadPub(): SharedQuote[] {

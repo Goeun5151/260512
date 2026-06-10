@@ -32,7 +32,7 @@ export function TemplateEditor({ template: t, onChange }: Props) {
     <div>
       {/* 고정 미리보기 */}
       <div className="sticky top-0 z-10 -mx-1 bg-background px-1 pb-4 pt-1">
-        <div className="mx-auto w-64">
+        <div className="mx-auto w-40">
           <TemplateCard record={SAMPLE} template={t} />
         </div>
       </div>

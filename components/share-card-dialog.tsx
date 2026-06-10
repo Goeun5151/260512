@@ -49,7 +49,7 @@ export function ShareCardDialog({ record, open, onOpenChange }: Props) {
         <DialogTitle className="border-b px-5 py-3 text-base">카드로 공유</DialogTitle>
 
         <div className="px-5 py-4">
-          <div className="mx-auto w-64">
+          <div className="mx-auto w-52">
             <TemplateCard record={record} template={template} innerRef={(el) => (cardRef.current = el)} />
           </div>
 

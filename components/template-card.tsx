@@ -42,7 +42,7 @@ export function TemplateCard({ record, template: t, innerRef }: Props) {
     <div
       ref={innerRef}
       className="relative w-full overflow-hidden rounded-xl"
-      style={{ aspectRatio: '4 / 5', background: t.background, containerType: 'inline-size' }}
+      style={{ aspectRatio: '1080 / 2340', background: t.background, containerType: 'inline-size' }}
     >
       {/* background image (사용자 사진) */}
       {t.backgroundImage ? (

@@ -70,6 +70,13 @@ export const TEXT_SWATCHES = [
   '#232120', '#6E6E6E', '#FFFFFF', '#8A6A4F', '#B5524B', '#3A6B5A', '#3C5A8A',
 ]
 
+// 기본 제공 배경 이미지 (public/bg/ 에 번들됨 — 오프라인 동작)
+export const DEFAULT_BG_IMAGES = [
+  { src: '/bg/paper-cream.jpg', label: '크림' },
+  { src: '/bg/paper-kraft.jpg', label: '크라프트' },
+  { src: '/bg/paper-night.jpg', label: '나이트' },
+]
+
 const baseSentence = (): TextStyle => ({
   font: 'pretendard', color: '#232120', align: 'center', bold: true, underline: false, size: 1, x: 0.5, y: 0.4,
 })

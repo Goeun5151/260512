@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/select'
 import { TemplateCard } from '@/components/template-card'
 import {
-  BG_SWATCHES, TEXT_SWATCHES, FONT_OPTIONS,
+  BG_SWATCHES, TEXT_SWATCHES, FONT_OPTIONS, DEFAULT_BG_IMAGES,
   type AlignKey, type FontKey, type Template, type TextStyle, type TitleFormat,
 } from '@/lib/templates'
 import { cn } from '@/lib/utils'
@@ -46,6 +46,23 @@ export function TemplateEditor({ template: t, onChange }: Props) {
 
         <Section title="배경">
           <Swatches values={BG_SWATCHES} current={t.background} onPick={(c) => onChange({ background: c, backgroundImage: '' })} />
+          {/* 기본 제공 배경 이미지 */}
+          <div className="mt-3 flex gap-2">
+            {DEFAULT_BG_IMAGES.map((bg) => (
+              <button
+                key={bg.src}
+                type="button"
+                aria-label={bg.label}
+                onClick={() => onChange({ backgroundImage: bg.src })}
+                className={cn(
+                  'h-14 w-11 overflow-hidden rounded-md border-2 transition-transform',
+                  t.backgroundImage === bg.src ? 'border-foreground scale-105' : 'border-border',
+                )}
+              >
+                <img src={bg.src} alt="" className="h-full w-full object-cover" />
+              </button>
+            ))}
+          </div>
           <div className="mt-3 flex items-center gap-2">
             <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border bg-background px-3 py-2 text-sm hover:bg-accent">
               <ImageIcon className="size-4" />
@@ -67,13 +84,10 @@ export function TemplateEditor({ template: t, onChange }: Props) {
                 onClick={() => onChange({ backgroundImage: '' })}
                 className="rounded-md border bg-background px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
               >
-                사진 제거
+                배경 사진 제거
               </button>
             ) : null}
           </div>
-          {t.backgroundImage ? (
-            <p className="mt-2 text-xs text-muted-foreground">사진 배경 적용됨 (색상 누르면 해제)</p>
-          ) : null}
         </Section>
 
         <Section title="기록 문장">

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { BookOpen, X } from 'lucide-react'
+import { BookOpen, X, ScanText } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { BookSearch } from '@/components/book-search'
+import { OcrDialog } from '@/components/ocr-dialog'
 import { useTags } from '@/lib/use-tags'
 import { cn } from '@/lib/utils'
 import type { BookRecord, BookSearchResult } from '@/lib/types'
@@ -55,6 +56,11 @@ export function RecordFormDialog({
   const [form, setForm] = useState(empty)
   const { tags: allTags, addTag } = useTags()
   const [newTag, setNewTag] = useState('')
+  const [ocrOpen, setOcrOpen] = useState(false)
+
+  function insertOcr(text: string) {
+    setForm((f) => ({ ...f, sentence: f.sentence ? `${f.sentence} ${text}` : text }))
+  }
 
   useEffect(() => {
     if (open) {
@@ -98,6 +104,7 @@ export function RecordFormDialog({
   const canSave = form.sentence.trim().length > 0
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[90vh] gap-0 overflow-y-auto p-0 sm:max-w-lg">
         <DialogHeader className="border-b px-6 py-4">
@@ -111,7 +118,16 @@ export function RecordFormDialog({
 
         <div className="space-y-5 px-6 py-5">
           <div className="space-y-2">
-            <Label htmlFor="sentence">책 속 문장</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="sentence">책 속 문장</Label>
+              <button
+                type="button"
+                onClick={() => setOcrOpen(true)}
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+              >
+                <ScanText className="size-3.5" />사진에서 문자 인식
+              </button>
+            </div>
             <Textarea
               id="sentence"
               value={form.sentence}
@@ -276,5 +292,7 @@ export function RecordFormDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    <OcrDialog open={ocrOpen} onOpenChange={setOcrOpen} onInsert={insertOcr} />
+    </>
   )
 }

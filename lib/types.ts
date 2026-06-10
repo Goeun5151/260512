@@ -7,6 +7,7 @@ export type BookRecord = {
   page: string
   memo: string
   cover: string
+  templateId?: string // 이 기록이 쓰는 카드 템플릿
   favorite: boolean
   createdAt: number
   updatedAt: number

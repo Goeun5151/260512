@@ -20,6 +20,7 @@ type Props = {
   onToggleFavorite: (id: string) => void
   onEdit: (record: BookRecord) => void
   onDelete: (id: string) => void
+  onSelectTemplate: (recordId: string, templateId: string) => void
 }
 
 function formatDate(ts: number) {
@@ -37,6 +38,7 @@ export function RecordDetailDialog({
   onToggleFavorite,
   onEdit,
   onDelete,
+  onSelectTemplate,
 }: Props) {
   const [shareOpen, setShareOpen] = useState(false)
   if (!record) return null
@@ -171,7 +173,7 @@ export function RecordDetailDialog({
         </div>
       </DialogContent>
     </Dialog>
-    <ShareCardDialog record={record} open={shareOpen} onOpenChange={setShareOpen} />
+    <ShareCardDialog record={record} open={shareOpen} onOpenChange={setShareOpen} onSelectTemplate={onSelectTemplate} />
     </>
   )
 }

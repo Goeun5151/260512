@@ -143,6 +143,7 @@ export default function Page() {
           setFormOpen(true)
         }}
         onDelete={deleteRecord}
+        onSelectTemplate={(id, templateId) => updateRecord(id, { templateId })}
       />
     </div>
   )

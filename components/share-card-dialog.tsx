@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { TemplateCard } from '@/components/template-card'
-import { useTemplates, useSelectedTemplate } from '@/lib/use-templates'
+import { useTemplates } from '@/lib/use-templates'
 import type { BookRecord } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -15,16 +15,16 @@ type Props = {
   record: BookRecord | null
   open: boolean
   onOpenChange: (v: boolean) => void
+  onSelectTemplate: (recordId: string, templateId: string) => void
 }
 
-export function ShareCardDialog({ record, open, onOpenChange }: Props) {
+export function ShareCardDialog({ record, open, onOpenChange, onSelectTemplate }: Props) {
   const { templates } = useTemplates()
-  const { selectedId, select } = useSelectedTemplate()
   const cardRef = useRef<HTMLDivElement | null>(null)
   const [saving, setSaving] = useState(false)
 
   if (!record) return null
-  const template = templates.find((t) => t.id === selectedId) ?? templates[0]
+  const template = templates.find((t) => t.id === record.templateId) ?? templates[0]
 
   async function saveImage() {
     if (!cardRef.current) return
@@ -58,7 +58,7 @@ export function ShareCardDialog({ record, open, onOpenChange }: Props) {
               <button
                 key={t.id}
                 type="button"
-                onClick={() => select(t.id)}
+                onClick={() => onSelectTemplate(record.id, t.id)}
                 className={cn(
                   'flex-shrink-0 rounded-md border px-3 py-1.5 text-xs transition-colors',
                   t.id === template.id

@@ -1,5 +1,5 @@
 // 하이브리드 OCR
-// - 폰(네이티브): Google ML Kit (한글 정확도 ↑↑) — @pantrist 플러그인
+// - 폰(네이티브): Google ML Kit 한국어 모델 (한글 정확도 ↑↑) — 직접 만든 KoreanOcr 플러그인
 // - 웹(크롬 미리보기): Tesseract.js (kor) + 흑백/이진화 전처리
 export async function recognizeLines(
   file: File,
@@ -19,20 +19,18 @@ export async function recognizeLines(
   return recognizeTesseract(file, onProgress)
 }
 
-// ── 네이티브: ML Kit ──
+// ── 네이티브: ML Kit 한국어 모델 (KoreanOcr 커스텀 플러그인) ──
+type KoreanOcrResult = { text: string; lines: { text: string }[] }
+type KoreanOcrPlugin = {
+  detectText(opts: { base64Image: string; rotation?: number }): Promise<KoreanOcrResult>
+}
+
 async function recognizeNative(file: File): Promise<string[]> {
-  const { CapacitorPluginMlKitTextRecognition } = await import(
-    '@pantrist/capacitor-plugin-ml-kit-text-recognition'
-  )
+  const { registerPlugin } = await import('@capacitor/core')
+  const KoreanOcr = registerPlugin<KoreanOcrPlugin>('KoreanOcr')
   const base64 = await fileToBase64(file)
-  const res = await CapacitorPluginMlKitTextRecognition.detectText({ base64Image: base64 })
-  const lines: string[] = []
-  for (const b of res.blocks ?? []) {
-    for (const l of b.lines ?? []) {
-      const t = l.text.trim()
-      if (t) lines.push(t)
-    }
-  }
+  const res = await KoreanOcr.detectText({ base64Image: base64 })
+  const lines = (res.lines ?? []).map((l) => l.text.trim()).filter(Boolean)
   if (lines.length) return lines
   return res.text.split('\n').map((s) => s.trim()).filter(Boolean)
 }

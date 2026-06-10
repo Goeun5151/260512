@@ -169,7 +169,7 @@ function StyleControls({ value, onChange }: { value: TextStyle; onChange: (v: Te
           ))}
         </div>
       </div>
-      <Range label="글자 크기" min={0.35} max={1.1} step={0.025} value={value.size}
+      <Range label="글자 크기" min={0.725} max={2.2} step={0.025} value={value.size}
         onChange={(v) => onChange({ ...value, size: v })} />
       <div className="grid grid-cols-2 gap-3">
         <Range label="가로 위치" min={0.05} max={0.95} step={0.01} value={value.x}

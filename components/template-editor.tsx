@@ -1,6 +1,6 @@
 'use client'
 
-import { Bold, Underline, AlignLeft, AlignCenter, AlignRight } from 'lucide-react'
+import { Bold, Underline, AlignLeft, AlignCenter, AlignRight, Check } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import {
@@ -17,6 +17,8 @@ const SAMPLE = {
   sentence: '사람은 자신이 본 것만큼만 세상을 이해한다.',
   bookTitle: '데미안',
   author: '헤르만 헤세',
+  chapter: '3장',
+  page: '87',
   cover: '/placeholder.svg',
 }
 
@@ -27,63 +29,77 @@ type Props = {
 
 export function TemplateEditor({ template: t, onChange }: Props) {
   return (
-    <div className="space-y-6">
-      {/* preview */}
-      <div className="mx-auto w-56">
-        <TemplateCard record={SAMPLE} template={t} />
+    <div>
+      {/* 고정 미리보기 */}
+      <div className="sticky top-0 z-10 -mx-1 bg-background px-1 pb-4 pt-1">
+        <div className="mx-auto w-48">
+          <TemplateCard record={SAMPLE} template={t} />
+        </div>
       </div>
 
-      <div className="space-y-2">
-        <Label>템플릿 이름</Label>
-        <Input value={t.name} onChange={(e) => onChange({ name: e.target.value })} className="bg-background" />
+      {/* 스크롤되는 컨트롤 */}
+      <div className="space-y-6">
+        <div className="space-y-2">
+          <Label>템플릿 이름</Label>
+          <Input value={t.name} onChange={(e) => onChange({ name: e.target.value })} className="bg-background" />
+        </div>
+
+        <Section title="배경색">
+          <Swatches values={BG_SWATCHES} current={t.background} onPick={(c) => onChange({ background: c })} />
+        </Section>
+
+        <Section title="기록 문장">
+          <StyleControls value={t.sentence} onChange={(sentence) => onChange({ sentence })} />
+        </Section>
+
+        <Section title="책 제목">
+          <StyleControls value={t.title} onChange={(title) => onChange({ title })} />
+          <div className="mt-3">
+            <Label className="text-xs text-muted-foreground">제목 포맷</Label>
+            <div className="mt-1.5 flex gap-2">
+              {([
+                ['brackets', '《제목》'],
+                ['corner', '「제목」'],
+                ['dash', '— 제목 —'],
+              ] as [TitleFormat, string][]).map(([fmt, lbl]) => (
+                <Toggle key={fmt} active={t.titleFormat === fmt} onClick={() => onChange({ titleFormat: fmt })}>
+                  {lbl}
+                </Toggle>
+              ))}
+            </div>
+          </div>
+        </Section>
+
+        <Section title="작가 · 챕터 · 페이지">
+          <div className="mb-3 flex flex-wrap gap-2">
+            <CheckChip label="작가" checked={t.showAuthor} onClick={() => onChange({ showAuthor: !t.showAuthor })} />
+            <CheckChip label="챕터" checked={t.showChapter} onClick={() => onChange({ showChapter: !t.showChapter })} />
+            <CheckChip label="페이지" checked={t.showPage} onClick={() => onChange({ showPage: !t.showPage })} />
+          </div>
+          <StyleControls value={t.meta} onChange={(meta) => onChange({ meta })} />
+        </Section>
+
+        <Section title="책 표지">
+          <div className="flex items-center justify-between">
+            <span className="text-sm">표지 표시</span>
+            <Toggle active={t.cover.show} onClick={() => onChange({ cover: { ...t.cover, show: !t.cover.show } })}>
+              {t.cover.show ? '켜짐' : '꺼짐'}
+            </Toggle>
+          </div>
+          {t.cover.show && (
+            <div className="mt-3 space-y-3">
+              <Range label="크기" min={0.15} max={0.7} step={0.01} value={t.cover.size}
+                onChange={(v) => onChange({ cover: { ...t.cover, size: v } })} />
+              <Range label="회전" min={-45} max={45} step={1} value={t.cover.rotation}
+                onChange={(v) => onChange({ cover: { ...t.cover, rotation: v } })} />
+              <Range label="가로 위치" min={0.1} max={0.9} step={0.01} value={t.cover.x}
+                onChange={(v) => onChange({ cover: { ...t.cover, x: v } })} />
+              <Range label="세로 위치" min={0.1} max={0.9} step={0.01} value={t.cover.y}
+                onChange={(v) => onChange({ cover: { ...t.cover, y: v } })} />
+            </div>
+          )}
+        </Section>
       </div>
-
-      <Section title="배경색">
-        <Swatches values={BG_SWATCHES} current={t.background} onPick={(c) => onChange({ background: c })} />
-      </Section>
-
-      <Section title="기록 문장">
-        <StyleControls value={t.sentence} onChange={(sentence) => onChange({ sentence })} />
-      </Section>
-
-      <Section title="책 제목">
-        <StyleControls value={t.title} onChange={(title) => onChange({ title })} />
-        <div className="mt-3">
-          <Label className="text-xs text-muted-foreground">제목 포맷</Label>
-          <div className="mt-1.5 flex gap-2">
-            {([
-              ['brackets', '《제목》'],
-              ['corner', '「제목」'],
-              ['dash', '— 제목 —'],
-            ] as [TitleFormat, string][]).map(([fmt, lbl]) => (
-              <Toggle key={fmt} active={t.titleFormat === fmt} onClick={() => onChange({ titleFormat: fmt })}>
-                {lbl}
-              </Toggle>
-            ))}
-          </div>
-        </div>
-      </Section>
-
-      <Section title="책 표지">
-        <div className="flex items-center justify-between">
-          <span className="text-sm">표지 표시</span>
-          <Toggle active={t.cover.show} onClick={() => onChange({ cover: { ...t.cover, show: !t.cover.show } })}>
-            {t.cover.show ? '켜짐' : '꺼짐'}
-          </Toggle>
-        </div>
-        {t.cover.show && (
-          <div className="mt-3 space-y-3">
-            <Range label="크기" min={0.15} max={0.7} step={0.01} value={t.cover.size}
-              onChange={(v) => onChange({ cover: { ...t.cover, size: v } })} />
-            <Range label="회전" min={-45} max={45} step={1} value={t.cover.rotation}
-              onChange={(v) => onChange({ cover: { ...t.cover, rotation: v } })} />
-            <Range label="가로 위치" min={0.1} max={0.9} step={0.01} value={t.cover.x}
-              onChange={(v) => onChange({ cover: { ...t.cover, x: v } })} />
-            <Range label="세로 위치" min={0.1} max={0.9} step={0.01} value={t.cover.y}
-              onChange={(v) => onChange({ cover: { ...t.cover, y: v } })} />
-          </div>
-        )}
-      </Section>
     </div>
   )
 }
@@ -91,9 +107,9 @@ export function TemplateEditor({ template: t, onChange }: Props) {
 function StyleControls({ value, onChange }: { value: TextStyle; onChange: (v: TextStyle) => void }) {
   return (
     <div className="space-y-3">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Select value={value.font} onValueChange={(v) => onChange({ ...value, font: v as FontKey })}>
-          <SelectTrigger className="h-9 w-32 bg-background"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-9 w-28 bg-background"><SelectValue /></SelectTrigger>
           <SelectContent>
             {FONT_OPTIONS.map((f) => (
               <SelectItem key={f.key} value={f.key}>{f.label}</SelectItem>
@@ -110,7 +126,7 @@ function StyleControls({ value, onChange }: { value: TextStyle; onChange: (v: Te
           ))}
         </div>
       </div>
-      <Range label="글자 크기" min={0.7} max={1.6} step={0.05} value={value.size}
+      <Range label="글자 크기" min={0.7} max={1.8} step={0.05} value={value.size}
         onChange={(v) => onChange({ ...value, size: v })} />
       <Swatches values={TEXT_SWATCHES} current={value.color} onPick={(c) => onChange({ ...value, color: c })} />
     </div>
@@ -141,9 +157,28 @@ function Toggle({ active, onClick, children }: { active: boolean; onClick: () =>
   )
 }
 
-function Swatches({ values, current, onPick }: { values: string[]; current: string; onPick: (c: string) => void }) {
+function CheckChip({ label, checked, onClick }: { label: string; checked: boolean; onClick: () => void }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors',
+        checked ? 'border-primary bg-primary text-primary-foreground' : 'bg-background text-muted-foreground',
+      )}
+    >
+      <span className={cn('inline-flex size-4 items-center justify-center rounded border', checked ? 'border-primary-foreground' : 'border-current')}>
+        {checked ? <Check className="size-3" /> : null}
+      </span>
+      {label}
+    </button>
+  )
+}
+
+function Swatches({ values, current, onPick }: { values: string[]; current: string; onPick: (c: string) => void }) {
+  const isPreset = values.some((c) => c.toLowerCase() === current.toLowerCase())
+  return (
+    <div className="flex flex-wrap items-center gap-2">
       {values.map((c) => (
         <button
           key={c}
@@ -157,6 +192,26 @@ function Swatches({ values, current, onPick }: { values: string[]; current: stri
           style={{ background: c }}
         />
       ))}
+      {/* 커스텀 컬러 (원하는 색 아무거나) */}
+      <label
+        className={cn(
+          'relative size-7 cursor-pointer overflow-hidden rounded-full border-2',
+          !isPreset ? 'border-foreground scale-110' : 'border-border',
+        )}
+        style={{
+          background: !isPreset
+            ? current
+            : 'conic-gradient(#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)',
+        }}
+        aria-label="커스텀 색상"
+      >
+        <input
+          type="color"
+          value={current}
+          onChange={(e) => onPick(e.target.value)}
+          className="absolute inset-0 cursor-pointer opacity-0"
+        />
+      </label>
     </div>
   )
 }

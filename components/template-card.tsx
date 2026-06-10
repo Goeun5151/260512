@@ -15,7 +15,7 @@ function textStyleToCss(s: TextStyle): CSSProperties {
 }
 
 type Props = {
-  record: Pick<BookRecord, 'sentence' | 'bookTitle' | 'author' | 'cover'>
+  record: Pick<BookRecord, 'sentence' | 'bookTitle' | 'author' | 'chapter' | 'page' | 'cover'>
   template: Template
   innerRef?: (el: HTMLDivElement | null) => void
 }
@@ -23,7 +23,12 @@ type Props = {
 /** Renders a record as a styled, shareable card per the given template. */
 export function TemplateCard({ record, template: t, innerRef }: Props) {
   const title = formatTitle(record.bookTitle, t.titleFormat)
-  const meta = [title, record.author].filter(Boolean).join('  ·  ')
+
+  const metaParts: string[] = []
+  if (t.showAuthor && record.author) metaParts.push(record.author)
+  if (t.showChapter && record.chapter) metaParts.push(record.chapter)
+  if (t.showPage && record.page) metaParts.push(`p.${record.page}`)
+  const meta = metaParts.join('  ·  ')
 
   return (
     <div
@@ -31,7 +36,7 @@ export function TemplateCard({ record, template: t, innerRef }: Props) {
       className="relative w-full overflow-hidden rounded-xl"
       style={{ aspectRatio: '4 / 5', background: t.background }}
     >
-      {/* cover */}
+      {/* cover — always portrait (2:3) */}
       {t.cover.show && record.cover ? (
         <img
           src={record.cover || '/placeholder.svg'}
@@ -39,6 +44,8 @@ export function TemplateCard({ record, template: t, innerRef }: Props) {
           className="pointer-events-none absolute rounded shadow-md"
           style={{
             width: `${t.cover.size * 100}%`,
+            aspectRatio: '2 / 3',
+            objectFit: 'cover',
             left: `${t.cover.x * 100}%`,
             top: `${t.cover.y * 100}%`,
             transform: `translate(-50%, -50%) rotate(${t.cover.rotation}deg)`,
@@ -47,17 +54,18 @@ export function TemplateCard({ record, template: t, innerRef }: Props) {
       ) : null}
 
       {/* text */}
-      <div className="absolute inset-0 flex flex-col justify-center gap-4 px-[9%] py-[10%]">
+      <div className="absolute inset-0 flex flex-col justify-center gap-3 px-[9%] py-[10%]">
         <p
           className="leading-relaxed"
           style={{ ...textStyleToCss(t.sentence), fontSize: `${t.sentence.size * 1.6}rem` }}
         >
           {record.sentence}
         </p>
+        {title ? (
+          <p style={{ ...textStyleToCss(t.title), fontSize: `${t.title.size * 0.95}rem` }}>{title}</p>
+        ) : null}
         {meta ? (
-          <p style={{ ...textStyleToCss(t.title), fontSize: `${t.title.size * 0.9}rem` }}>
-            {meta}
-          </p>
+          <p style={{ ...textStyleToCss(t.meta), fontSize: `${t.meta.size * 0.9}rem` }}>{meta}</p>
         ) : null}
       </div>
     </div>

@@ -1,6 +1,6 @@
 import type { BookRecord } from './types'
 
-// ── Text styling for a single text element (sentence or title) ──
+// ── Text styling for a text element (sentence / title / meta) ──
 export type FontKey = 'pretendard' | 'serif' | 'gothic' | 'mono'
 export type AlignKey = 'left' | 'center' | 'right'
 
@@ -10,7 +10,7 @@ export type TextStyle = {
   align: AlignKey
   bold: boolean
   underline: boolean
-  size: number // rem-ish scale, 1 = base
+  size: number // 1 = base
 }
 
 // 책 제목 표시 포맷 3종
@@ -18,7 +18,7 @@ export type TitleFormat = 'brackets' | 'corner' | 'dash'
 
 export type CoverStyle = {
   show: boolean
-  size: number // 0.15 ~ 1.0 (relative to card width)
+  size: number // 0.15 ~ 0.7 (relative to card width)
   rotation: number // deg
   x: number // 0..1 center position
   y: number // 0..1 center position
@@ -31,6 +31,11 @@ export type Template = {
   sentence: TextStyle
   title: TextStyle
   titleFormat: TitleFormat
+  // 작가 · 챕터 · 페이지 (세 항목이 같은 스타일을 공유)
+  meta: TextStyle
+  showAuthor: boolean
+  showChapter: boolean
+  showPage: boolean
   cover: CoverStyle
 }
 
@@ -68,37 +73,45 @@ const baseSentence = (): TextStyle => ({
 const baseTitle = (): TextStyle => ({
   font: 'pretendard', color: '#847D72', align: 'center', bold: false, underline: false, size: 1,
 })
+const baseMeta = (): TextStyle => ({
+  font: 'pretendard', color: '#847D72', align: 'center', bold: false, underline: false, size: 0.85,
+})
 const baseCover = (): CoverStyle => ({ show: false, size: 0.28, rotation: 0, x: 0.5, y: 0.82 })
+const showFlags = () => ({ showAuthor: true, showChapter: false, showPage: true })
 
 /** Five default templates (editable & extensible — later syncable to cloud). */
 export function defaultTemplates(): Template[] {
   return [
     {
       id: 't1', name: '미니멀', background: '#FAF8F1',
-      sentence: baseSentence(),
-      title: baseTitle(), titleFormat: 'brackets', cover: baseCover(),
+      sentence: baseSentence(), title: baseTitle(), titleFormat: 'brackets',
+      meta: baseMeta(), ...showFlags(), cover: baseCover(),
     },
     {
       id: 't2', name: '명조 클래식', background: '#FFFFFF',
       sentence: { ...baseSentence(), font: 'serif', bold: false, size: 1.1 },
-      title: { ...baseTitle(), font: 'serif' }, titleFormat: 'dash', cover: baseCover(),
+      title: { ...baseTitle(), font: 'serif' }, titleFormat: 'dash',
+      meta: { ...baseMeta(), font: 'serif' }, ...showFlags(), cover: baseCover(),
     },
     {
       id: 't3', name: '크라프트', background: '#EAE3D6',
       sentence: { ...baseSentence(), align: 'left' },
       title: { ...baseTitle(), align: 'left' }, titleFormat: 'brackets',
+      meta: { ...baseMeta(), align: 'left' }, ...showFlags(),
       cover: { ...baseCover(), show: true, x: 0.82, y: 0.2, size: 0.22 },
     },
     {
       id: 't4', name: '다크', background: '#14110E',
       sentence: { ...baseSentence(), color: '#F5F0E6' },
-      title: { ...baseTitle(), color: '#B6A993' }, titleFormat: 'corner', cover: baseCover(),
+      title: { ...baseTitle(), color: '#B6A993' }, titleFormat: 'corner',
+      meta: { ...baseMeta(), color: '#B6A993' }, ...showFlags(), cover: baseCover(),
     },
     {
       id: 't5', name: '카드+표지', background: '#F2EFE9',
       sentence: { ...baseSentence(), size: 0.95 },
-      title: { ...baseTitle() }, titleFormat: 'brackets',
-      cover: { ...baseCover(), show: true, x: 0.5, y: 0.8, size: 0.3 },
+      title: baseTitle(), titleFormat: 'brackets',
+      meta: baseMeta(), ...showFlags(),
+      cover: { ...baseCover(), show: true, x: 0.5, y: 0.82, size: 0.3 },
     },
   ]
 }

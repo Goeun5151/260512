@@ -16,6 +16,7 @@ import { LibraryView } from '@/components/library-view'
 import { SharedView } from '@/components/shared-view'
 import { AdBanner } from '@/components/ad-banner'
 import { publishShared, type SharedQuote } from '@/lib/use-shared'
+import { downloadCsv } from '@/lib/export'
 import { RecordFormDialog } from '@/components/record-form-dialog'
 import { RecordDetailDialog } from '@/components/record-detail-dialog'
 import { useRecords } from '@/lib/use-records'
@@ -116,6 +117,15 @@ export default function Page() {
             <DropdownMenuContent align="end" className="w-28">
               <DropdownMenuItem onClick={() => router.push('/settings')}>템플릿</DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/settings/tags')}>태그</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  if (records.length === 0) { toast.error('내보낼 기록이 없어요.'); return }
+                  downloadCsv(records)
+                  toast.success('CSV로 내보냈어요.')
+                }}
+              >
+                내보내기(CSV)
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

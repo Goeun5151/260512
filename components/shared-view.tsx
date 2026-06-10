@@ -28,33 +28,35 @@ export function SharedView({ onImport }: Props) {
         </Button>
       </div>
 
-      {/* 인스타그램풍 2단 그리드 */}
-      <div className="grid grid-cols-2 gap-3">
+      {/* 인스타그램풍 1열 피드: 카드 + 구분선 + 아이콘 */}
+      <div className="space-y-5">
         {picks.map((q, i) => {
           const liked = isLiked(q.id)
           const tpl = templates[i % templates.length]
           return (
-            <div key={q.id} className="relative overflow-hidden rounded-xl border">
+            <div key={q.id} className="overflow-hidden rounded-xl border bg-card">
               <TemplateCard
                 record={{ sentence: q.sentence, bookTitle: q.bookTitle, author: q.author, chapter: '', page: q.page ?? '', cover: '' }}
                 template={tpl}
               />
-              {/* 하단 액션 오버레이 */}
-              <div className="absolute inset-x-0 bottom-0 flex items-center justify-between bg-gradient-to-t from-black/45 to-transparent px-2 py-2">
+              {/* 회색 구분선 아래 액션 아이콘 */}
+              <div className="flex items-center gap-4 border-t px-4 py-2.5">
                 <button
                   type="button"
+                  aria-label="좋아요"
                   onClick={() => toggleLike(q.id)}
-                  className="inline-flex items-center gap-1 rounded-full bg-black/35 px-2 py-1 text-xs text-white backdrop-blur"
+                  className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
                 >
-                  <Heart className={cn('size-3.5', liked && 'fill-white')} />
+                  <Heart className={cn('size-5', liked && 'fill-foreground text-foreground')} />
                   {q.likes + (liked ? 1 : 0)}
                 </button>
                 <button
                   type="button"
+                  aria-label="담기"
                   onClick={() => { onImport(q); toast.success('내 서재에 담았어요.') }}
-                  className="inline-flex items-center gap-1 rounded-full bg-white/85 px-2 py-1 text-xs font-medium text-black backdrop-blur"
+                  className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
                 >
-                  <BookmarkPlus className="size-3.5" />담기
+                  <BookmarkPlus className="size-5" />담기
                 </button>
               </div>
             </div>

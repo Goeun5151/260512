@@ -8,14 +8,32 @@ import { defaultTemplates, type Template } from './templates'
 const STORAGE_KEY = 'hanjul-templates-v1'
 const SELECTED_KEY = 'hanjul-selected-template-v1'
 
+// Fill in any fields missing from older saved templates (forward-compatible).
+function normalize(t: any): Template {
+  const d = defaultTemplates()[0]
+  return {
+    id: t?.id ?? `t-${Math.random().toString(36).slice(2, 8)}`,
+    name: t?.name ?? '템플릿',
+    background: t?.background ?? d.background,
+    sentence: { ...d.sentence, ...(t?.sentence ?? {}) },
+    title: { ...d.title, ...(t?.title ?? {}) },
+    titleFormat: t?.titleFormat ?? d.titleFormat,
+    meta: { ...d.meta, ...(t?.meta ?? {}) },
+    showAuthor: t?.showAuthor ?? true,
+    showChapter: t?.showChapter ?? false,
+    showPage: t?.showPage ?? true,
+    cover: { ...d.cover, ...(t?.cover ?? {}) },
+  }
+}
+
 function load(): Template[] {
   if (typeof window === 'undefined') return defaultTemplates()
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY)
     if (!raw) return defaultTemplates()
-    const parsed = JSON.parse(raw) as Template[]
+    const parsed = JSON.parse(raw) as unknown
     if (!Array.isArray(parsed) || parsed.length === 0) return defaultTemplates()
-    return parsed
+    return parsed.map(normalize)
   } catch {
     return defaultTemplates()
   }

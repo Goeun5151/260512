@@ -1,7 +1,8 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { Capacitor } from '@capacitor/core'
 import { Plus, Settings } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -16,6 +17,7 @@ import { LibraryView } from '@/components/library-view'
 import { SharedView } from '@/components/shared-view'
 import { publishShared, type SharedQuote } from '@/lib/use-shared'
 import { downloadCsv } from '@/lib/export'
+import { AdBanner } from '@/components/ad-banner'
 import { RecordFormDialog } from '@/components/record-form-dialog'
 import { RecordDetailDialog } from '@/components/record-detail-dialog'
 import { useRecords } from '@/lib/use-records'
@@ -36,10 +38,15 @@ export default function Page() {
   } = useRecords()
 
   const [tab, setTab] = useState<Tab>('today')
+  const [isNative, setIsNative] = useState(false)
   const [formOpen, setFormOpen] = useState(false)
   const [editing, setEditing] = useState<BookRecord | null>(null)
   const [selected, setSelected] = useState<BookRecord | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
+
+  useEffect(() => {
+    setIsNative(Capacitor.isNativePlatform())
+  }, [])
 
   const selectedLive = selected
     ? records.find((r) => r.id === selected.id) ?? selected
@@ -97,7 +104,12 @@ export default function Page() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-2xl flex-col px-4 pb-28 sm:px-6">
+    <div
+      className={cn(
+        'mx-auto flex min-h-screen max-w-2xl flex-col px-4 sm:px-6',
+        isNative ? 'pb-44' : 'pb-28',
+      )}
+    >
       <header className="pt-10 pb-6">
         <div className="flex items-start justify-between">
           <div>
@@ -164,10 +176,15 @@ export default function Page() {
       <Button
         onClick={openAdd}
         size="lg"
-        className="fixed bottom-6 left-1/2 z-40 h-12 -translate-x-1/2 rounded-full px-6 shadow-lg"
+        className={cn(
+          'fixed left-1/2 z-40 h-12 -translate-x-1/2 rounded-full px-6 shadow-lg',
+          isNative ? 'bottom-20' : 'bottom-6',
+        )}
       >
         <Plus className="size-5" />한 줄 기록
       </Button>
+
+      {isNative && <AdBanner />}
 
       <RecordFormDialog
         open={formOpen}

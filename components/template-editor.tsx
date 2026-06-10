@@ -98,7 +98,7 @@ export function TemplateEditor({ template: t, onChange }: Props) {
         </Section>
 
         <Section title="책 제목">
-          <StyleControls value={t.title} onChange={(title) => onChange({ title })} />
+          <StyleControls value={t.title} onChange={(title) => onChange({ title })} minSize={1.45} maxSize={4.4} />
           <div className="mt-3">
             <Label className="text-xs text-muted-foreground">제목 포맷</Label>
             <div className="mt-1.5 flex gap-2">
@@ -121,7 +121,7 @@ export function TemplateEditor({ template: t, onChange }: Props) {
             <CheckChip label="챕터" checked={t.showChapter} onClick={() => onChange({ showChapter: !t.showChapter })} />
             <CheckChip label="페이지" checked={t.showPage} onClick={() => onChange({ showPage: !t.showPage })} />
           </div>
-          <StyleControls value={t.meta} onChange={(meta) => onChange({ meta })} />
+          <StyleControls value={t.meta} onChange={(meta) => onChange({ meta })} minSize={1.45} maxSize={4.4} />
         </Section>
 
         <Section title="책 표지">
@@ -149,7 +149,9 @@ export function TemplateEditor({ template: t, onChange }: Props) {
   )
 }
 
-function StyleControls({ value, onChange }: { value: TextStyle; onChange: (v: TextStyle) => void }) {
+function StyleControls({ value, onChange, minSize = 0.725, maxSize = 2.2 }: {
+  value: TextStyle; onChange: (v: TextStyle) => void; minSize?: number; maxSize?: number
+}) {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
@@ -172,7 +174,7 @@ function StyleControls({ value, onChange }: { value: TextStyle; onChange: (v: Te
           ))}
         </div>
       </div>
-      <Range label="글자 크기" min={0.725} max={2.2} step={0.025} value={value.size}
+      <Range label="글자 크기" min={minSize} max={maxSize} step={0.025} value={value.size}
         onChange={(v) => onChange({ ...value, size: v })} />
       <div className="grid grid-cols-2 gap-3">
         <Range label="가로 위치" min={0.05} max={0.95} step={0.01} value={value.x}

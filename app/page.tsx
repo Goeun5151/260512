@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
+import Link from 'next/link'
+import { Plus, Settings } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { DailyView } from '@/components/daily-view'
@@ -67,13 +68,20 @@ export default function Page() {
   return (
     <div className="mx-auto flex min-h-screen max-w-2xl flex-col px-4 pb-28 sm:px-6">
       <header className="pt-10 pb-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">한줄기록</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               책 속 문장을 모아두고, 매일 다시 꺼내 보는 곳
             </p>
           </div>
+          <Link
+            href="/settings"
+            aria-label="설정"
+            className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            <Settings className="size-5" />
+          </Link>
         </div>
 
         <nav className="mt-6 flex gap-1 rounded-lg border bg-background p-1">

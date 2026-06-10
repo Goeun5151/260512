@@ -1,6 +1,7 @@
 'use client'
 
-import { Heart, Share2, Pencil, Trash2, BookOpen } from 'lucide-react'
+import { useState } from 'react'
+import { Heart, Share2, Sparkles, Pencil, Trash2, BookOpen } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Dialog,
@@ -8,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { ShareCardDialog } from '@/components/share-card-dialog'
 import type { BookRecord } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -36,6 +38,7 @@ export function RecordDetailDialog({
   onEdit,
   onDelete,
 }: Props) {
+  const [shareOpen, setShareOpen] = useState(false)
   if (!record) return null
 
   async function handleShare() {
@@ -57,6 +60,7 @@ export function RecordDetailDialog({
   }
 
   return (
+    <>
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="gap-0 overflow-hidden p-0 sm:max-w-lg">
         <DialogTitle className="sr-only">기록 상세</DialogTitle>
@@ -133,6 +137,15 @@ export function RecordDetailDialog({
             <Share2 className="size-4" />
             공유
           </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShareOpen(true)}
+            className="gap-1.5"
+          >
+            <Sparkles className="size-4" />
+            카드
+          </Button>
           <div className="flex-1" />
           <Button
             variant="ghost"
@@ -158,5 +171,7 @@ export function RecordDetailDialog({
         </div>
       </DialogContent>
     </Dialog>
+    <ShareCardDialog record={record} open={shareOpen} onOpenChange={setShareOpen} />
+    </>
   )
 }

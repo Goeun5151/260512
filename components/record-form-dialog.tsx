@@ -15,6 +15,8 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { BookSearch } from '@/components/book-search'
+import { useTags } from '@/lib/use-tags'
+import { cn } from '@/lib/utils'
 import type { BookRecord, BookSearchResult } from '@/lib/types'
 
 type Props = {
@@ -29,6 +31,7 @@ type Props = {
     page: string
     memo: string
     cover: string
+    tags: string[]
   }) => void
 }
 
@@ -40,6 +43,7 @@ const empty = {
   page: '',
   memo: '',
   cover: '',
+  tags: [] as string[],
 }
 
 export function RecordFormDialog({
@@ -49,6 +53,8 @@ export function RecordFormDialog({
   onSubmit,
 }: Props) {
   const [form, setForm] = useState(empty)
+  const { tags: allTags, addTag } = useTags()
+  const [newTag, setNewTag] = useState('')
 
   useEffect(() => {
     if (open) {
@@ -62,11 +68,19 @@ export function RecordFormDialog({
               page: initial.page,
               memo: initial.memo,
               cover: initial.cover,
+              tags: initial.tags ?? [],
             }
           : empty,
       )
     }
   }, [open, initial])
+
+  function toggleTag(tag: string) {
+    setForm((f) => ({
+      ...f,
+      tags: f.tags.includes(tag) ? f.tags.filter((t) => t !== tag) : [...f.tags, tag],
+    }))
+  }
 
   function handleSelectBook(book: BookSearchResult) {
     setForm((f) => ({
@@ -199,6 +213,42 @@ export function RecordFormDialog({
               className="min-h-20 resize-none bg-background leading-relaxed"
             />
           </div>
+
+          <div className="space-y-2">
+            <Label>태그</Label>
+            <div className="flex flex-wrap gap-2">
+              {allTags.map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => toggleTag(tag)}
+                  className={cn(
+                    'rounded-full border px-3 py-1 text-sm transition-colors',
+                    form.tags.includes(tag)
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'bg-background text-muted-foreground hover:text-foreground',
+                  )}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-2 pt-1">
+              <Input
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    const t = newTag.trim()
+                    if (t) { addTag(t); toggleTag(t); setNewTag('') }
+                  }
+                }}
+                placeholder="새 태그 입력 후 Enter"
+                className="bg-background"
+              />
+            </div>
+          </div>
         </div>
 
         <DialogFooter className="border-t px-6 py-4">
@@ -216,6 +266,7 @@ export function RecordFormDialog({
                 page: form.page.trim(),
                 memo: form.memo.trim(),
                 cover: form.cover,
+                tags: form.tags,
               })
             }}
           >

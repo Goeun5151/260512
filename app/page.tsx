@@ -53,6 +53,7 @@ export default function Page() {
     page: string
     memo: string
     cover: string
+    tags: string[]
   }) {
     if (editing) {
       updateRecord(editing.id, data)

@@ -113,6 +113,16 @@ export function RecordDetailDialog({
               </p>
             </div>
           ) : null}
+
+          {record.tags && record.tags.length > 0 ? (
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {record.tags.map((t) => (
+                <span key={t} className="rounded-full border bg-background px-2.5 py-0.5 text-xs text-muted-foreground">
+                  #{t}
+                </span>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         <div className="flex items-center gap-1 border-t px-4 py-3">

@@ -106,14 +106,11 @@ export default function Page() {
             </p>
           </div>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                aria-label="설정"
-                className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
-              >
-                <Settings className="size-5" />
-              </button>
+            <DropdownMenuTrigger
+              aria-label="설정"
+              className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+            >
+              <Settings className="size-5" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-28">
               <DropdownMenuItem onClick={() => router.push('/settings')}>템플릿</DropdownMenuItem>

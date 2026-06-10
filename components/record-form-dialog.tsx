@@ -25,6 +25,7 @@ type Props = {
     sentence: string
     bookTitle: string
     author: string
+    chapter: string
     page: string
     memo: string
     cover: string
@@ -35,6 +36,7 @@ const empty = {
   sentence: '',
   bookTitle: '',
   author: '',
+  chapter: '',
   page: '',
   memo: '',
   cover: '',
@@ -56,6 +58,7 @@ export function RecordFormDialog({
               sentence: initial.sentence,
               bookTitle: initial.bookTitle,
               author: initial.author,
+              chapter: initial.chapter ?? '',
               page: initial.page,
               memo: initial.memo,
               cover: initial.cover,
@@ -162,16 +165,28 @@ export function RecordFormDialog({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="page">페이지</Label>
-            <Input
-              id="page"
-              value={form.page}
-              onChange={(e) => set('page', e.target.value)}
-              placeholder="예: 124"
-              className="bg-background"
-              inputMode="numeric"
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label htmlFor="chapter">챕터</Label>
+              <Input
+                id="chapter"
+                value={form.chapter}
+                onChange={(e) => set('chapter', e.target.value)}
+                placeholder="예: 3장 / 프롤로그"
+                className="bg-background"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="page">페이지</Label>
+              <Input
+                id="page"
+                value={form.page}
+                onChange={(e) => set('page', e.target.value)}
+                placeholder="예: 124"
+                className="bg-background"
+                inputMode="numeric"
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -197,6 +212,7 @@ export function RecordFormDialog({
                 sentence: form.sentence.trim(),
                 bookTitle: form.bookTitle.trim(),
                 author: form.author.trim(),
+                chapter: form.chapter.trim(),
                 page: form.page.trim(),
                 memo: form.memo.trim(),
                 cover: form.cover,

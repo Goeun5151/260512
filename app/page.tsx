@@ -48,6 +48,7 @@ export default function Page() {
     sentence: string
     bookTitle: string
     author: string
+    chapter: string
     page: string
     memo: string
     cover: string

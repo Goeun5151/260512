@@ -1,6 +1,6 @@
 'use client'
 
-import { Star, Share2, Pencil, Trash2, BookOpen } from 'lucide-react'
+import { Heart, Share2, Pencil, Trash2, BookOpen } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Dialog,
@@ -88,6 +88,7 @@ export function RecordDetailDialog({
               </p>
               <p className="truncate text-xs text-muted-foreground">
                 {record.author || '저자 미상'}
+                {record.chapter ? ` · ${record.chapter}` : ''}
                 {record.page ? ` · p.${record.page}` : ''}
               </p>
               <p className="mt-0.5 text-[11px] text-muted-foreground">
@@ -115,7 +116,7 @@ export function RecordDetailDialog({
             onClick={() => onToggleFavorite(record.id)}
             className="gap-1.5"
           >
-            <Star
+            <Heart
               className={cn(
                 'size-4',
                 record.favorite && 'fill-foreground text-foreground',

@@ -3,6 +3,7 @@ export type BookRecord = {
   sentence: string
   bookTitle: string
   author: string
+  chapter: string
   page: string
   memo: string
   cover: string

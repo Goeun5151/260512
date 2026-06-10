@@ -76,7 +76,9 @@ export const TEXT_SWATCHES = [
 export const DEFAULT_BG_IMAGES = [
   { src: '/bg/paper-cream.jpg', label: '크림' },
   { src: '/bg/paper-kraft.jpg', label: '크라프트' },
-  { src: '/bg/paper-night.jpg', label: '나이트' },
+  { src: '/bg/grid.jpg', label: '모눈' },
+  { src: '/bg/marble.jpg', label: '대리석' },
+  { src: '/bg/crumpled.jpg', label: '구겨진종이' },
 ]
 
 const baseSentence = (): TextStyle => ({

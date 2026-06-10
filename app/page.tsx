@@ -14,7 +14,6 @@ import {
 import { DailyView } from '@/components/daily-view'
 import { LibraryView } from '@/components/library-view'
 import { SharedView } from '@/components/shared-view'
-import { AdBanner } from '@/components/ad-banner'
 import { publishShared, type SharedQuote } from '@/lib/use-shared'
 import { downloadCsv } from '@/lib/export'
 import { RecordFormDialog } from '@/components/record-form-dialog'
@@ -165,12 +164,10 @@ export default function Page() {
       <Button
         onClick={openAdd}
         size="lg"
-        className="fixed bottom-[4.5rem] left-1/2 z-40 h-12 -translate-x-1/2 rounded-full px-6 shadow-lg"
+        className="fixed bottom-6 left-1/2 z-40 h-12 -translate-x-1/2 rounded-full px-6 shadow-lg"
       >
         <Plus className="size-5" />한 줄 기록
       </Button>
-
-      <AdBanner />
 
       <RecordFormDialog
         open={formOpen}

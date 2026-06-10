@@ -12,9 +12,26 @@ type Props = {
   onImport: (q: SharedQuote) => void
 }
 
+// 진짜 공유(Supabase) 연결 전까지 준비중 표시
+const COMING_SOON = true
+
 export function SharedView({ onImport }: Props) {
   const { picks, refresh, toggleLike, isLiked } = useShared()
   const { templates } = useTemplates()
+
+  if (COMING_SOON) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed py-20 text-center">
+        <div className="flex size-14 items-center justify-center rounded-full bg-muted">
+          <Users className="size-6 text-muted-foreground" />
+        </div>
+        <h2 className="mt-5 text-lg font-semibold">공유 서재는 곧 열려요</h2>
+        <p className="mt-2 max-w-xs text-pretty text-sm leading-relaxed text-muted-foreground">
+          다른 사람들이 기록한 문장을 둘러보고 내 서재로 담아오는 기능을 준비하고 있어요.
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">

@@ -1,10 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Plus, Settings } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { DailyView } from '@/components/daily-view'
 import { LibraryView } from '@/components/library-view'
 import { RecordFormDialog } from '@/components/record-form-dialog'
@@ -16,6 +22,7 @@ import { cn } from '@/lib/utils'
 type Tab = 'today' | 'library'
 
 export default function Page() {
+  const router = useRouter()
   const {
     records,
     loaded,
@@ -76,13 +83,21 @@ export default function Page() {
               책 속 문장을 모아두고, 매일 다시 꺼내 보는 곳
             </p>
           </div>
-          <Link
-            href="/settings"
-            aria-label="설정"
-            className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
-          >
-            <Settings className="size-5" />
-          </Link>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                aria-label="설정"
+                className="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
+              >
+                <Settings className="size-5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-28">
+              <DropdownMenuItem onClick={() => router.push('/settings')}>템플릿</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/settings/tags')}>태그</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <nav className="mt-6 flex gap-1 rounded-lg border bg-background p-1">

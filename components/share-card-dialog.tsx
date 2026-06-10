@@ -32,7 +32,7 @@ export function ShareCardDialog({ record, open, onOpenChange, onSelectTemplate }
     try {
       const dataUrl = await toPng(cardRef.current, { pixelRatio: 2, cacheBust: true })
       const link = document.createElement('a')
-      link.download = `한줄기록-${Date.now()}.png`
+      link.download = `독서기록-${Date.now()}.png`
       link.href = dataUrl
       link.click()
       toast.success('카드 이미지를 저장했어요.')

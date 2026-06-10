@@ -34,7 +34,7 @@ export function SharedView({ onImport }: Props) {
           const liked = isLiked(q.id)
           const tpl = templates[i % templates.length]
           return (
-            <div key={q.id} className="overflow-hidden rounded-xl border bg-card">
+            <div key={q.id} className="mx-auto w-[70%] overflow-hidden rounded-xl border bg-card">
               <TemplateCard
                 record={{ sentence: q.sentence, bookTitle: q.bookTitle, author: q.author, chapter: '', page: q.page ?? '', cover: '' }}
                 template={tpl}

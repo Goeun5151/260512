@@ -102,7 +102,7 @@ export default function Page() {
       <header className="pt-10 pb-6">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">한줄기록</h1>
+            <h1 className="text-2xl font-bold tracking-tight">독서기록</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               책 속 문장을 모아두고, 매일 다시 꺼내 보는 곳
             </p>

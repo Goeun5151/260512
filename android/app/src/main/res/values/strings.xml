@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">한줄기록</string>
-    <string name="title_activity_main">한줄기록</string>
+    <string name="app_name">독서기록</string>
+    <string name="title_activity_main">독서기록</string>
     <string name="package_name">com.onelinebook</string>
     <string name="custom_url_scheme">com.onelinebook</string>
 </resources>

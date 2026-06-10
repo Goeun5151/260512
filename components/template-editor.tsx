@@ -92,6 +92,9 @@ export function TemplateEditor({ template: t, onChange }: Props) {
 
         <Section title="기록 문장">
           <StyleControls value={t.sentence} onChange={(sentence) => onChange({ sentence })} />
+          <div className="mt-3">
+            <CheckChip label="앞에 따옴표 “ 표시" checked={t.showQuote} onClick={() => onChange({ showQuote: !t.showQuote })} />
+          </div>
         </Section>
 
         <Section title="책 제목">

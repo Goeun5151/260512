@@ -40,6 +40,7 @@ export type Template = {
   showAuthor: boolean
   showChapter: boolean
   showPage: boolean
+  showQuote: boolean // 문장 앞 큰 따옴표
   cover: CoverStyle
 }
 
@@ -88,7 +89,7 @@ const baseMeta = (): TextStyle => ({
   font: 'pretendard', color: '#847D72', align: 'center', bold: false, underline: false, italic: false, size: 0.85, x: 0.5, y: 0.76,
 })
 const baseCover = (): CoverStyle => ({ show: false, size: 0.28, rotation: 0, x: 0.5, y: 0.82 })
-const showFlags = () => ({ showAuthor: true, showChapter: false, showPage: true })
+const showFlags = () => ({ showAuthor: true, showChapter: false, showPage: true, showQuote: false })
 
 /** Five default templates (editable & extensible — later syncable to cloud). */
 export function defaultTemplates(): Template[] {

@@ -4,14 +4,21 @@ import type { CSSProperties } from 'react'
 import type { BookRecord } from '@/lib/types'
 import { fontCss, formatTitle, type TextStyle, type Template } from '@/lib/templates'
 
-// font sizes are in cqw (% of card width) so text scales with the card size.
-function textBlock(s: TextStyle, fontCqw: number): CSSProperties {
+// 카드 안에서의 위치 (요소 중심을 x,y에)
+function posStyle(s: TextStyle): CSSProperties {
   return {
     position: 'absolute',
     left: `${s.x * 100}%`,
     top: `${s.y * 100}%`,
     transform: 'translate(-50%, -50%)',
     width: '84%',
+    textAlign: s.align,
+  }
+}
+
+// 글자 스타일. 폰트 크기는 cqw(카드 폭 %)로 비례.
+function typeStyle(s: TextStyle, fontCqw: number): CSSProperties {
+  return {
     margin: 0,
     fontFamily: fontCss(s.font),
     color: s.color,
@@ -67,10 +74,26 @@ export function TemplateCard({ record, template: t, innerRef }: Props) {
         />
       ) : null}
 
-      {/* text elements (each freely positioned) */}
-      <p style={textBlock(t.sentence, 3.4)}>{record.sentence}</p>
-      {title ? <p style={textBlock(t.title, 2.1)}>{title}</p> : null}
-      {meta ? <p style={textBlock(t.meta, 1.8)}>{meta}</p> : null}
+      {/* 기록 문장 (+ 선택 시 큰 따옴표) */}
+      <div style={posStyle(t.sentence)}>
+        {t.showQuote ? (
+          <span
+            style={{
+              display: 'block',
+              fontFamily: 'Georgia, serif',
+              fontSize: `${t.sentence.size * 5}cqw`,
+              lineHeight: 0.8,
+              color: '#555555',
+            }}
+          >
+            “
+          </span>
+        ) : null}
+        <p style={typeStyle(t.sentence, 3.4)}>{record.sentence}</p>
+      </div>
+
+      {title ? <p style={{ ...posStyle(t.title), ...typeStyle(t.title, 2.1) }}>{title}</p> : null}
+      {meta ? <p style={{ ...posStyle(t.meta), ...typeStyle(t.meta, 1.8) }}>{meta}</p> : null}
     </div>
   )
 }

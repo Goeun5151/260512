@@ -23,6 +23,7 @@ function normalize(t: any): Template {
     showAuthor: t?.showAuthor ?? true,
     showChapter: t?.showChapter ?? false,
     showPage: t?.showPage ?? true,
+    showQuote: t?.showQuote ?? false,
     cover: { ...d.cover, ...(t?.cover ?? {}) },
   }
 }

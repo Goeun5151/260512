@@ -1,8 +1,52 @@
-// 이미지에서 한국어 텍스트 인식 (Tesseract.js)
-// - 한국어 전용 모델(영어 섞으면 한글을 라틴으로 오인식해서 정확도 급락)
-// - 흑백 + 대비 보정 전처리로 사진 인식률 개선
-// 언어 데이터는 첫 실행 시 받아서 캐시됨(인터넷 1회 필요).
+// 하이브리드 OCR
+// - 폰(네이티브): Google ML Kit (한글 정확도 ↑↑) — @pantrist 플러그인
+// - 웹(크롬 미리보기): Tesseract.js (kor) + 흑백/이진화 전처리
+export async function recognizeLines(
+  file: File,
+  onProgress?: (p: number) => void,
+): Promise<string[]> {
+  try {
+    const { Capacitor } = await import('@capacitor/core')
+    if (Capacitor.isNativePlatform()) {
+      onProgress?.(0.4)
+      const lines = await recognizeNative(file)
+      onProgress?.(1)
+      return lines
+    }
+  } catch {
+    // 네이티브 모듈 없으면 웹 폴백
+  }
+  return recognizeTesseract(file, onProgress)
+}
 
+// ── 네이티브: ML Kit ──
+async function recognizeNative(file: File): Promise<string[]> {
+  const { CapacitorPluginMlKitTextRecognition } = await import(
+    '@pantrist/capacitor-plugin-ml-kit-text-recognition'
+  )
+  const base64 = await fileToBase64(file)
+  const res = await CapacitorPluginMlKitTextRecognition.detectText({ base64Image: base64 })
+  const lines: string[] = []
+  for (const b of res.blocks ?? []) {
+    for (const l of b.lines ?? []) {
+      const t = l.text.trim()
+      if (t) lines.push(t)
+    }
+  }
+  if (lines.length) return lines
+  return res.text.split('\n').map((s) => s.trim()).filter(Boolean)
+}
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader()
+    r.onload = () => resolve(String(r.result).replace(/^data:.*;base64,/, ''))
+    r.onerror = reject
+    r.readAsDataURL(file)
+  })
+}
+
+// ── 웹: Tesseract.js ──
 async function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const img = new Image()
@@ -12,14 +56,13 @@ async function loadImage(src: string): Promise<HTMLImageElement> {
   })
 }
 
-/** 흑백 + 대비 강화 + 너무 작은 이미지는 살짝 확대. */
+/** 흑백 + 대비 + Otsu 이진화 + 작은 사진 업스케일. */
 async function preprocess(file: File): Promise<HTMLCanvasElement> {
   const url = URL.createObjectURL(file)
   try {
     const img = await loadImage(url)
     const longest = Math.max(img.width, img.height)
-    // 작은 사진은 ~1600px까지 키워서 글자 또렷하게 (최대 2배)
-    const scale = Math.min(2, Math.max(1, 1600 / longest))
+    const scale = Math.min(2.2, Math.max(1, 1700 / longest))
     const w = Math.round(img.width * scale)
     const h = Math.round(img.height * scale)
     const canvas = document.createElement('canvas')
@@ -29,11 +72,34 @@ async function preprocess(file: File): Promise<HTMLCanvasElement> {
     ctx.drawImage(img, 0, 0, w, h)
     const imgData = ctx.getImageData(0, 0, w, h)
     const d = imgData.data
-    const contrast = 1.4
-    for (let i = 0; i < d.length; i += 4) {
-      const gray = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]
-      let v = (gray - 128) * contrast + 128
-      v = v < 0 ? 0 : v > 255 ? 255 : v
+    // grayscale + histogram
+    const hist = new Array(256).fill(0)
+    const gray = new Uint8ClampedArray(w * h)
+    for (let i = 0, p = 0; i < d.length; i += 4, p++) {
+      const g = Math.round(0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2])
+      gray[p] = g
+      hist[g]++
+    }
+    // Otsu threshold
+    const total = w * h
+    let sum = 0
+    for (let t = 0; t < 256; t++) sum += t * hist[t]
+    let sumB = 0, wB = 0, maxVar = 0, threshold = 128
+    for (let t = 0; t < 256; t++) {
+      wB += hist[t]
+      if (wB === 0) continue
+      const wF = total - wB
+      if (wF === 0) break
+      sumB += t * hist[t]
+      const mB = sumB / wB
+      const mF = (sum - sumB) / wF
+      const between = wB * wF * (mB - mF) * (mB - mF)
+      if (between > maxVar) { maxVar = between; threshold = t }
+    }
+    // binarize (살짝 여유 둬서 흐린 글자도 살림)
+    const thr = threshold + 8
+    for (let i = 0, p = 0; i < d.length; i += 4, p++) {
+      const v = gray[p] >= thr ? 255 : 0
       d[i] = d[i + 1] = d[i + 2] = v
     }
     ctx.putImageData(imgData, 0, 0)
@@ -43,10 +109,7 @@ async function preprocess(file: File): Promise<HTMLCanvasElement> {
   }
 }
 
-export async function recognizeLines(
-  file: File,
-  onProgress?: (p: number) => void,
-): Promise<string[]> {
+async function recognizeTesseract(file: File, onProgress?: (p: number) => void): Promise<string[]> {
   const { createWorker } = await import('tesseract.js')
   const canvas = await preprocess(file)
   const worker = await createWorker('kor', 1, {
@@ -56,7 +119,7 @@ export async function recognizeLines(
   })
   try {
     await worker.setParameters({
-      tessedit_pageseg_mode: '4' as never, // 한 컬럼(책 페이지)
+      tessedit_pageseg_mode: '4' as never,
       preserve_interword_spaces: '1',
     })
     const { data } = await worker.recognize(canvas)

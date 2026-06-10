@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ChevronLeft, RotateCcw } from 'lucide-react'
+import { ChevronLeft, RotateCcw, Check } from 'lucide-react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { TemplateEditor } from '@/components/template-editor'
 import { useTemplates } from '@/lib/use-templates'
@@ -27,6 +28,9 @@ export default function SettingsPage() {
         <div className="flex-1" />
         <Button variant="ghost" size="sm" onClick={resetTemplates} className="gap-1.5 text-muted-foreground">
           <RotateCcw className="size-4" />초기화
+        </Button>
+        <Button size="sm" onClick={() => toast.success('템플릿을 저장했어요.')} className="gap-1.5">
+          <Check className="size-4" />저장
         </Button>
       </header>
 

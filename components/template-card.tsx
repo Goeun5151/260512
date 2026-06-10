@@ -4,13 +4,22 @@ import type { CSSProperties } from 'react'
 import type { BookRecord } from '@/lib/types'
 import { fontCss, formatTitle, type TextStyle, type Template } from '@/lib/templates'
 
-function textStyleToCss(s: TextStyle): CSSProperties {
+// font sizes are in cqw (% of card width) so text scales with the card size.
+function textBlock(s: TextStyle, fontCqw: number): CSSProperties {
   return {
+    position: 'absolute',
+    left: `${s.x * 100}%`,
+    top: `${s.y * 100}%`,
+    transform: 'translate(-50%, -50%)',
+    width: '84%',
+    margin: 0,
     fontFamily: fontCss(s.font),
     color: s.color,
     textAlign: s.align,
     fontWeight: s.bold ? 700 : 400,
     textDecoration: s.underline ? 'underline' : 'none',
+    fontSize: `${s.size * fontCqw}cqw`,
+    lineHeight: 1.5,
   }
 }
 
@@ -23,7 +32,6 @@ type Props = {
 /** Renders a record as a styled, shareable card per the given template. */
 export function TemplateCard({ record, template: t, innerRef }: Props) {
   const title = formatTitle(record.bookTitle, t.titleFormat)
-
   const metaParts: string[] = []
   if (t.showAuthor && record.author) metaParts.push(record.author)
   if (t.showChapter && record.chapter) metaParts.push(record.chapter)
@@ -34,7 +42,7 @@ export function TemplateCard({ record, template: t, innerRef }: Props) {
     <div
       ref={innerRef}
       className="relative w-full overflow-hidden rounded-xl"
-      style={{ aspectRatio: '4 / 5', background: t.background }}
+      style={{ aspectRatio: '4 / 5', background: t.background, containerType: 'inline-size' }}
     >
       {/* cover — always portrait (2:3) */}
       {t.cover.show && record.cover ? (
@@ -53,21 +61,10 @@ export function TemplateCard({ record, template: t, innerRef }: Props) {
         />
       ) : null}
 
-      {/* text */}
-      <div className="absolute inset-0 flex flex-col justify-center gap-3 px-[9%] py-[10%]">
-        <p
-          className="leading-relaxed"
-          style={{ ...textStyleToCss(t.sentence), fontSize: `${t.sentence.size * 1.6}rem` }}
-        >
-          {record.sentence}
-        </p>
-        {title ? (
-          <p style={{ ...textStyleToCss(t.title), fontSize: `${t.title.size * 0.95}rem` }}>{title}</p>
-        ) : null}
-        {meta ? (
-          <p style={{ ...textStyleToCss(t.meta), fontSize: `${t.meta.size * 0.9}rem` }}>{meta}</p>
-        ) : null}
-      </div>
+      {/* text elements (each freely positioned) */}
+      <p style={textBlock(t.sentence, 6.8)}>{record.sentence}</p>
+      {title ? <p style={textBlock(t.title, 4.2)}>{title}</p> : null}
+      {meta ? <p style={textBlock(t.meta, 3.6)}>{meta}</p> : null}
     </div>
   )
 }

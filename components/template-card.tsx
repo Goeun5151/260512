@@ -17,6 +17,7 @@ function textBlock(s: TextStyle, fontCqw: number): CSSProperties {
     color: s.color,
     textAlign: s.align,
     fontWeight: s.bold ? 700 : 400,
+    fontStyle: s.italic ? 'italic' : 'normal',
     textDecoration: s.underline ? 'underline' : 'none',
     fontSize: `${s.size * fontCqw}cqw`,
     lineHeight: 1.5,
@@ -42,7 +43,7 @@ export function TemplateCard({ record, template: t, innerRef }: Props) {
     <div
       ref={innerRef}
       className="relative w-full overflow-hidden rounded-xl"
-      style={{ aspectRatio: '1080 / 2340', background: t.background, containerType: 'inline-size' }}
+      style={{ aspectRatio: '6 / 9', background: t.background, containerType: 'inline-size' }}
     >
       {/* background image (사용자 사진) */}
       {t.backgroundImage ? (
@@ -67,9 +68,9 @@ export function TemplateCard({ record, template: t, innerRef }: Props) {
       ) : null}
 
       {/* text elements (each freely positioned) */}
-      <p style={textBlock(t.sentence, 6.8)}>{record.sentence}</p>
-      {title ? <p style={textBlock(t.title, 4.2)}>{title}</p> : null}
-      {meta ? <p style={textBlock(t.meta, 3.6)}>{meta}</p> : null}
+      <p style={textBlock(t.sentence, 3.4)}>{record.sentence}</p>
+      {title ? <p style={textBlock(t.title, 2.1)}>{title}</p> : null}
+      {meta ? <p style={textBlock(t.meta, 1.8)}>{meta}</p> : null}
     </div>
   )
 }

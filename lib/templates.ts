@@ -10,6 +10,7 @@ export type TextStyle = {
   align: AlignKey
   bold: boolean
   underline: boolean
+  italic: boolean
   size: number // 1 = base
   x: number // 0..1 center position
   y: number // 0..1 center position
@@ -78,13 +79,13 @@ export const DEFAULT_BG_IMAGES = [
 ]
 
 const baseSentence = (): TextStyle => ({
-  font: 'pretendard', color: '#232120', align: 'center', bold: true, underline: false, size: 1, x: 0.5, y: 0.4,
+  font: 'pretendard', color: '#232120', align: 'center', bold: true, underline: false, italic: false, size: 1, x: 0.5, y: 0.4,
 })
 const baseTitle = (): TextStyle => ({
-  font: 'pretendard', color: '#847D72', align: 'center', bold: false, underline: false, size: 1, x: 0.5, y: 0.66,
+  font: 'pretendard', color: '#847D72', align: 'center', bold: false, underline: false, italic: false, size: 1, x: 0.5, y: 0.66,
 })
 const baseMeta = (): TextStyle => ({
-  font: 'pretendard', color: '#847D72', align: 'center', bold: false, underline: false, size: 0.85, x: 0.5, y: 0.76,
+  font: 'pretendard', color: '#847D72', align: 'center', bold: false, underline: false, italic: false, size: 0.85, x: 0.5, y: 0.76,
 })
 const baseCover = (): CoverStyle => ({ show: false, size: 0.28, rotation: 0, x: 0.5, y: 0.82 })
 const showFlags = () => ({ showAuthor: true, showChapter: false, showPage: true })

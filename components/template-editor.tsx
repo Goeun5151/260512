@@ -1,6 +1,6 @@
 'use client'
 
-import { Bold, Underline, AlignLeft, AlignCenter, AlignRight, Check, Image as ImageIcon } from 'lucide-react'
+import { Bold, Underline, Italic, AlignLeft, AlignCenter, AlignRight, Check, Image as ImageIcon } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import {
@@ -159,6 +159,7 @@ function StyleControls({ value, onChange }: { value: TextStyle; onChange: (v: Te
           </SelectContent>
         </Select>
         <Toggle active={value.bold} onClick={() => onChange({ ...value, bold: !value.bold })}><Bold className="size-4" /></Toggle>
+        <Toggle active={value.italic} onClick={() => onChange({ ...value, italic: !value.italic })}><Italic className="size-4" /></Toggle>
         <Toggle active={value.underline} onClick={() => onChange({ ...value, underline: !value.underline })}><Underline className="size-4" /></Toggle>
         <div className="flex gap-1">
           {(['left', 'center', 'right'] as AlignKey[]).map((a) => (
@@ -168,7 +169,7 @@ function StyleControls({ value, onChange }: { value: TextStyle; onChange: (v: Te
           ))}
         </div>
       </div>
-      <Range label="글자 크기" min={0.7} max={2.2} step={0.05} value={value.size}
+      <Range label="글자 크기" min={0.35} max={1.1} step={0.025} value={value.size}
         onChange={(v) => onChange({ ...value, size: v })} />
       <div className="grid grid-cols-2 gap-3">
         <Range label="가로 위치" min={0.05} max={0.95} step={0.01} value={value.x}

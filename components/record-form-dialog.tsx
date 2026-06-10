@@ -24,6 +24,8 @@ type Props = {
   open: boolean
   onOpenChange: (v: boolean) => void
   initial?: BookRecord | null
+  titleOptions?: string[]
+  authorOptions?: string[]
   onSubmit: (data: {
     sentence: string
     bookTitle: string
@@ -51,6 +53,8 @@ export function RecordFormDialog({
   open,
   onOpenChange,
   initial,
+  titleOptions = [],
+  authorOptions = [],
   onSubmit,
 }: Props) {
   const [form, setForm] = useState(empty)
@@ -177,21 +181,29 @@ export function RecordFormDialog({
               <Label htmlFor="title">제목</Label>
               <Input
                 id="title"
+                list="rf-title-options"
                 value={form.bookTitle}
                 onChange={(e) => set('bookTitle', e.target.value)}
                 placeholder="직접 입력 가능"
                 className="bg-background"
               />
+              <datalist id="rf-title-options">
+                {titleOptions.map((t) => <option key={t} value={t} />)}
+              </datalist>
             </div>
             <div className="space-y-2">
               <Label htmlFor="author">저자</Label>
               <Input
                 id="author"
+                list="rf-author-options"
                 value={form.author}
                 onChange={(e) => set('author', e.target.value)}
                 placeholder="직접 입력 가능"
                 className="bg-background"
               />
+              <datalist id="rf-author-options">
+                {authorOptions.map((a) => <option key={a} value={a} />)}
+              </datalist>
             </div>
           </div>
 

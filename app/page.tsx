@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Settings } from 'lucide-react'
 import { toast } from 'sonner'
@@ -41,6 +41,15 @@ export default function Page() {
   const selectedLive = selected
     ? records.find((r) => r.id === selected.id) ?? selected
     : null
+
+  const titleOptions = useMemo(
+    () => Array.from(new Set(records.map((r) => r.bookTitle.trim()).filter(Boolean))),
+    [records],
+  )
+  const authorOptions = useMemo(
+    () => Array.from(new Set(records.map((r) => r.author.trim()).filter(Boolean))),
+    [records],
+  )
 
   function openAdd() {
     setEditing(null)
@@ -145,6 +154,8 @@ export default function Page() {
           if (!v) setEditing(null)
         }}
         initial={editing}
+        titleOptions={titleOptions}
+        authorOptions={authorOptions}
         onSubmit={handleSubmit}
       />
 

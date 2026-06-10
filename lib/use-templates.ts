@@ -15,6 +15,7 @@ function normalize(t: any): Template {
     id: t?.id ?? `t-${Math.random().toString(36).slice(2, 8)}`,
     name: t?.name ?? '템플릿',
     background: t?.background ?? d.background,
+    backgroundImage: t?.backgroundImage ?? '',
     sentence: { ...d.sentence, ...(t?.sentence ?? {}) },
     title: { ...d.title, ...(t?.title ?? {}) },
     titleFormat: t?.titleFormat ?? d.titleFormat,

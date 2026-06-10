@@ -1,6 +1,6 @@
 'use client'
 
-import { Bold, Underline, AlignLeft, AlignCenter, AlignRight, Check } from 'lucide-react'
+import { Bold, Underline, AlignLeft, AlignCenter, AlignRight, Check, Image as ImageIcon } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import {
@@ -44,8 +44,36 @@ export function TemplateEditor({ template: t, onChange }: Props) {
           <Input value={t.name} onChange={(e) => onChange({ name: e.target.value })} className="bg-background" />
         </div>
 
-        <Section title="배경색">
-          <Swatches values={BG_SWATCHES} current={t.background} onPick={(c) => onChange({ background: c })} />
+        <Section title="배경">
+          <Swatches values={BG_SWATCHES} current={t.background} onPick={(c) => onChange({ background: c, backgroundImage: '' })} />
+          <div className="mt-3 flex items-center gap-2">
+            <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border bg-background px-3 py-2 text-sm hover:bg-accent">
+              <ImageIcon className="size-4" />
+              내 사진 선택
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  if (file) onChange({ backgroundImage: await fileToDataUrl(file) })
+                  e.target.value = ''
+                }}
+              />
+            </label>
+            {t.backgroundImage ? (
+              <button
+                type="button"
+                onClick={() => onChange({ backgroundImage: '' })}
+                className="rounded-md border bg-background px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
+              >
+                사진 제거
+              </button>
+            ) : null}
+          </div>
+          {t.backgroundImage ? (
+            <p className="mt-2 text-xs text-muted-foreground">사진 배경 적용됨 (색상 누르면 해제)</p>
+          ) : null}
         </Section>
 
         <Section title="기록 문장">
@@ -220,6 +248,32 @@ function Swatches({ values, current, onPick }: { values: string[]; current: stri
       </label>
     </div>
   )
+}
+
+// 갤러리에서 고른 사진을 적당히 축소·압축해서 data URL로 (localStorage 용량 절약)
+async function fileToDataUrl(file: File, max = 1280, quality = 0.82): Promise<string> {
+  const dataUrl = await new Promise<string>((resolve, reject) => {
+    const r = new FileReader()
+    r.onload = () => resolve(r.result as string)
+    r.onerror = reject
+    r.readAsDataURL(file)
+  })
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const i = new Image()
+    i.onload = () => resolve(i)
+    i.onerror = reject
+    i.src = dataUrl
+  })
+  const scale = Math.min(1, max / Math.max(img.width, img.height))
+  const w = Math.round(img.width * scale)
+  const h = Math.round(img.height * scale)
+  const canvas = document.createElement('canvas')
+  canvas.width = w
+  canvas.height = h
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return dataUrl
+  ctx.drawImage(img, 0, 0, w, h)
+  return canvas.toDataURL('image/jpeg', quality)
 }
 
 function Range({ label, min, max, step, value, onChange }: {

@@ -30,6 +30,7 @@ export type Template = {
   id: string
   name: string
   background: string // hex
+  backgroundImage?: string // data URL (사용자가 고른 사진). 있으면 색 대신 사용
   sentence: TextStyle
   title: TextStyle
   titleFormat: TitleFormat

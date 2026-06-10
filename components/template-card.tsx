@@ -44,6 +44,11 @@ export function TemplateCard({ record, template: t, innerRef }: Props) {
       className="relative w-full overflow-hidden rounded-xl"
       style={{ aspectRatio: '4 / 5', background: t.background, containerType: 'inline-size' }}
     >
+      {/* background image (사용자 사진) */}
+      {t.backgroundImage ? (
+        <img src={t.backgroundImage} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover" />
+      ) : null}
+
       {/* cover — always portrait (2:3) */}
       {t.cover.show && record.cover ? (
         <img

@@ -1,8 +1,9 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Search, LayoutGrid, List, BookMarked, Library } from 'lucide-react'
+import { Search, LayoutGrid, List, BookMarked, Library, Heart } from 'lucide-react'
 import { Input } from '@/components/ui/input'
+import { useTags } from '@/lib/use-tags'
 import {
   Select,
   SelectContent,
@@ -27,12 +28,9 @@ export function LibraryView({ records, onOpen, onToggleFavorite }: Props) {
   const [query, setQuery] = useState('')
   const [selectedTags, setSelectedTags] = useState<string[]>([]) // 다중선택
   const [groupByBook, setGroupByBook] = useState(false)
+  const [favoritesOnly, setFavoritesOnly] = useState(false)
 
-  const allTags = useMemo(() => {
-    const set = new Set<string>()
-    records.forEach((r) => (r.tags ?? []).forEach((t) => t && set.add(t)))
-    return Array.from(set)
-  }, [records])
+  const { tags: savedTags } = useTags()
 
   function toggleTag(tag: string) {
     setSelectedTags((cur) => (cur.includes(tag) ? cur.filter((t) => t !== tag) : [...cur, tag]))
@@ -41,6 +39,7 @@ export function LibraryView({ records, onOpen, onToggleFavorite }: Props) {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     let list = records
+    if (favoritesOnly) list = list.filter((r) => r.favorite)
     if (selectedTags.length) {
       list = list.filter((r) => (r.tags ?? []).some((t) => selectedTags.includes(t)))
     }
@@ -62,7 +61,7 @@ export function LibraryView({ records, onOpen, onToggleFavorite }: Props) {
       sorted.sort((a, b) => (a.bookTitle || '힣').localeCompare(b.bookTitle || '힣', 'ko'))
     }
     return sorted
-  }, [records, query, sort, selectedTags])
+  }, [records, query, sort, selectedTags, favoritesOnly])
 
   const groups = useMemo(() => {
     if (!groupByBook) return null
@@ -119,6 +118,10 @@ export function LibraryView({ records, onOpen, onToggleFavorite }: Props) {
             </SelectContent>
           </Select>
           <div className="flex items-center rounded-md border bg-background p-0.5">
+            <Button variant="ghost" size="icon" aria-label="즐겨찾기만 보기"
+              className={cn('size-8', favoritesOnly && 'bg-accent')} onClick={() => setFavoritesOnly((v) => !v)}>
+              <Heart className={cn('size-4', favoritesOnly && 'fill-foreground')} />
+            </Button>
             <Button variant="ghost" size="icon" aria-label="책별로 묶어보기"
               className={cn('size-8', groupByBook && 'bg-accent')} onClick={() => setGroupByBook((v) => !v)}>
               <Library className="size-4" />
@@ -135,11 +138,11 @@ export function LibraryView({ records, onOpen, onToggleFavorite }: Props) {
         </div>
       </div>
 
-      {/* 태그 다중선택 필터 */}
-      {allTags.length > 0 && (
+      {/* 태그 다중선택 필터 (설정에 저장된 태그) */}
+      {savedTags.length > 0 && (
         <div className="flex flex-wrap gap-2">
           <TagChip label="전체" active={selectedTags.length === 0} onClick={() => setSelectedTags([])} />
-          {allTags.map((t) => (
+          {savedTags.map((t) => (
             <TagChip key={t} label={`#${t}`} active={selectedTags.includes(t)} onClick={() => toggleTag(t)} />
           ))}
         </div>

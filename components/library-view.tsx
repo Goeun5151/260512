@@ -13,6 +13,8 @@ import {
 } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import { RecordCard } from '@/components/record-card'
+import { TemplateCard } from '@/components/template-card'
+import { useTemplates } from '@/lib/use-templates'
 import type { BookRecord, SortMode, ViewMode } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -31,6 +33,7 @@ export function LibraryView({ records, onOpen, onToggleFavorite }: Props) {
   const [favoritesOnly, setFavoritesOnly] = useState(false)
 
   const { tags: savedTags } = useTags()
+  const { templates } = useTemplates()
 
   function toggleTag(tag: string) {
     setSelectedTags((cur) => (cur.includes(tag) ? cur.filter((t) => t !== tag) : [...cur, tag]))
@@ -78,10 +81,25 @@ export function LibraryView({ records, onOpen, onToggleFavorite }: Props) {
   function renderCards(items: BookRecord[]) {
     if (view === 'grid') {
       return (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {items.map((r) => (
-            <RecordCard key={r.id} record={r} view="grid" onOpen={onOpen} onToggleFavorite={onToggleFavorite} />
-          ))}
+        <div className="grid grid-cols-2 gap-3">
+          {items.map((r) => {
+            const tpl = templates.find((t) => t.id === r.templateId) ?? templates[0]
+            return (
+              <div key={r.id} className="relative">
+                <button type="button" onClick={() => onOpen(r)} className="block w-full overflow-hidden rounded-xl border">
+                  <TemplateCard record={r} template={tpl} />
+                </button>
+                <button
+                  type="button"
+                  aria-label="즐겨찾기"
+                  onClick={(e) => { e.stopPropagation(); onToggleFavorite(r.id) }}
+                  className="absolute right-2 top-2 inline-flex size-7 items-center justify-center rounded-full bg-background/70 backdrop-blur"
+                >
+                  <Heart className={cn('size-4', r.favorite && 'fill-foreground text-foreground')} />
+                </button>
+              </div>
+            )
+          })}
         </div>
       )
     }

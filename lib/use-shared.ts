@@ -40,8 +40,13 @@ function sample<T>(arr: T[], n: number): T[] {
   return [...arr].sort(() => Math.random() - 0.5).slice(0, n)
 }
 
-/** 기록을 공유 DB(스텁)에 올림. */
+/** 기록을 공유 DB(스텁)에 올림. 같은 문장이 이미 있으면 중복 추가 안 함. */
 export function publishShared(q: Omit<SharedQuote, 'id' | 'likes'>) {
+  const norm = (s: string) => s.replace(/\s+/g, ' ').trim()
+  const target = norm(q.sentence)
+  if (!target) return
+  const exists = [...SEED, ...loadPub()].some((x) => norm(x.sentence) === target)
+  if (exists) return // 이미 공유 DB에 있음 → 중복 방지
   const pub = loadPub()
   pub.unshift({ ...q, id: `p-${Date.now()}`, likes: 0 })
   try { window.localStorage.setItem(PUB_KEY, JSON.stringify(pub)) } catch {}

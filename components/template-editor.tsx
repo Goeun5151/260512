@@ -91,10 +91,13 @@ export function TemplateEditor({ template: t, onChange }: Props) {
         </Section>
 
         <Section title="기록 문장">
-          <StyleControls value={t.sentence} onChange={(sentence) => onChange({ sentence })} />
-          <div className="mt-3">
-            <CheckChip label="앞에 따옴표 “ 표시" checked={t.showQuote} onClick={() => onChange({ showQuote: !t.showQuote })} />
-          </div>
+          <StyleControls
+            value={t.sentence}
+            onChange={(sentence) => onChange({ sentence })}
+            trailing={
+              <Toggle active={t.showQuote} onClick={() => onChange({ showQuote: !t.showQuote })}>따옴표</Toggle>
+            }
+          />
         </Section>
 
         <Section title="책 제목">
@@ -149,8 +152,8 @@ export function TemplateEditor({ template: t, onChange }: Props) {
   )
 }
 
-function StyleControls({ value, onChange, minSize = 0.725, maxSize = 2.2 }: {
-  value: TextStyle; onChange: (v: TextStyle) => void; minSize?: number; maxSize?: number
+function StyleControls({ value, onChange, minSize = 0.725, maxSize = 2.2, trailing }: {
+  value: TextStyle; onChange: (v: TextStyle) => void; minSize?: number; maxSize?: number; trailing?: React.ReactNode
 }) {
   return (
     <div className="space-y-3">
@@ -173,6 +176,7 @@ function StyleControls({ value, onChange, minSize = 0.725, maxSize = 2.2 }: {
             </Toggle>
           ))}
         </div>
+        {trailing}
       </div>
       <Range label="글자 크기" min={minSize} max={maxSize} step={0.025} value={value.size}
         onChange={(v) => onChange({ ...value, size: v })} />

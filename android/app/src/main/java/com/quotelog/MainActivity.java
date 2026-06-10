@@ -1,4 +1,4 @@
-package com.onelinebook;
+package com.quotelog;
 
 import com.getcapacitor.BridgeActivity;
 

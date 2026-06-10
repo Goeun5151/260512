@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace = "com.onelinebook"
+    namespace = "com.quotelog"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.onelinebook"
+        applicationId "com.quotelog"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -35,6 +35,7 @@ type Props = {
     memo: string
     cover: string
     tags: string[]
+    visibility: 'private' | 'public'
   }) => void
 }
 
@@ -47,6 +48,7 @@ const empty = {
   memo: '',
   cover: '',
   tags: [] as string[],
+  visibility: 'private' as 'private' | 'public',
 }
 
 export function RecordFormDialog({
@@ -79,6 +81,7 @@ export function RecordFormDialog({
               memo: initial.memo,
               cover: initial.cover,
               tags: initial.tags ?? [],
+              visibility: initial.visibility ?? 'private',
             }
           : empty,
       )
@@ -277,6 +280,29 @@ export function RecordFormDialog({
               />
             </div>
           </div>
+
+          <div className="space-y-2">
+            <Label>저장 위치</Label>
+            <div className="grid grid-cols-2 gap-2">
+              {([
+                ['private', '개인', '내 기기에만 저장'],
+                ['public', '공유', '공유 서재에도 올리기'],
+              ] as ['private' | 'public', string, string][]).map(([v, title, desc]) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setForm((f) => ({ ...f, visibility: v }))}
+                  className={cn(
+                    'rounded-lg border p-3 text-left transition-colors',
+                    form.visibility === v ? 'border-primary bg-primary/10' : 'bg-background',
+                  )}
+                >
+                  <p className="text-sm font-medium">{title}</p>
+                  <p className="text-[11px] text-muted-foreground">{desc}</p>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <DialogFooter className="border-t px-6 py-4">
@@ -295,6 +321,7 @@ export function RecordFormDialog({
                 memo: form.memo.trim(),
                 cover: form.cover,
                 tags: form.tags,
+                visibility: form.visibility,
               })
             }}
           >

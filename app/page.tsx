@@ -13,13 +13,15 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { DailyView } from '@/components/daily-view'
 import { LibraryView } from '@/components/library-view'
+import { SharedView } from '@/components/shared-view'
+import { publishShared, type SharedQuote } from '@/lib/use-shared'
 import { RecordFormDialog } from '@/components/record-form-dialog'
 import { RecordDetailDialog } from '@/components/record-detail-dialog'
 import { useRecords } from '@/lib/use-records'
 import type { BookRecord } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
-type Tab = 'today' | 'library'
+type Tab = 'today' | 'library' | 'shared'
 
 export default function Page() {
   const router = useRouter()
@@ -70,16 +72,27 @@ export default function Page() {
     memo: string
     cover: string
     tags: string[]
+    visibility: 'private' | 'public'
   }) {
     if (editing) {
       updateRecord(editing.id, data)
       toast.success('기록을 수정했어요.')
     } else {
       addRecord(data)
-      toast.success('한 줄을 기록했어요.')
+      toast.success(data.visibility === 'public' ? '한 줄을 기록하고 공유했어요.' : '한 줄을 기록했어요.')
+    }
+    if (data.visibility === 'public') {
+      publishShared({ sentence: data.sentence, bookTitle: data.bookTitle, author: data.author, page: data.page })
     }
     setFormOpen(false)
     setEditing(null)
+  }
+
+  function importShared(q: SharedQuote) {
+    addRecord({
+      sentence: q.sentence, bookTitle: q.bookTitle, author: q.author,
+      chapter: '', page: q.page ?? '', memo: '', cover: '', tags: [], visibility: 'private',
+    })
   }
 
   return (
@@ -113,11 +126,11 @@ export default function Page() {
           <TabButton active={tab === 'today'} onClick={() => setTab('today')}>
             오늘의 한 줄
           </TabButton>
-          <TabButton
-            active={tab === 'library'}
-            onClick={() => setTab('library')}
-          >
+          <TabButton active={tab === 'library'} onClick={() => setTab('library')}>
             내 서재
+          </TabButton>
+          <TabButton active={tab === 'shared'} onClick={() => setTab('shared')}>
+            공유 서재
           </TabButton>
         </nav>
       </header>
@@ -130,12 +143,14 @@ export default function Page() {
           </div>
         ) : tab === 'today' ? (
           <DailyView records={records} onOpen={openDetail} onAdd={openAdd} />
-        ) : (
+        ) : tab === 'library' ? (
           <LibraryView
             records={records}
             onOpen={openDetail}
             onToggleFavorite={toggleFavorite}
           />
+        ) : (
+          <SharedView onImport={importShared} />
         )}
       </main>
 

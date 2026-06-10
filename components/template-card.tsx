@@ -74,16 +74,19 @@ export function TemplateCard({ record, template: t, innerRef }: Props) {
         />
       ) : null}
 
-      {/* 기록 문장 (+ 선택 시 큰 따옴표) */}
+      {/* 기록 문장 (+ 선택 시 왼쪽 큰 따옴표, 연하게 — 메인화면처럼) */}
       <div style={posStyle(t.sentence)}>
         {t.showQuote ? (
           <span
             style={{
               display: 'block',
+              textAlign: 'left',
               fontFamily: 'Georgia, serif',
-              fontSize: `${t.sentence.size * 5}cqw`,
-              lineHeight: 0.8,
-              color: '#555555',
+              fontSize: `${t.sentence.size * 9}cqw`,
+              lineHeight: 0.6,
+              color: t.sentence.color,
+              opacity: 0.25,
+              marginBottom: '0.5cqw',
             }}
           >
             “

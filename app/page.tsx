@@ -134,10 +134,14 @@ export default function Page() {
               <DropdownMenuItem onClick={() => router.push('/settings')}>설정</DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/settings/tags')}>태그</DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => {
+                onClick={async () => {
                   if (records.length === 0) { toast.error('내보낼 기록이 없어요.'); return }
-                  downloadCsv(records)
-                  toast.success('CSV로 내보냈어요.')
+                  try {
+                    await downloadCsv(records)
+                    toast.success('CSV로 내보냈어요.')
+                  } catch {
+                    toast.error('CSV 내보내기에 실패했어요.')
+                  }
                 }}
               >
                 내보내기(CSV)

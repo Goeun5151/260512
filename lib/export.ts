@@ -26,13 +26,36 @@ export function recordsToCsv(records: BookRecord[]): string {
   return '﻿' + [header.join(','), ...rows].join('\r\n')
 }
 
-export function downloadCsv(records: BookRecord[]) {
+export async function downloadCsv(records: BookRecord[]) {
   const csv = recordsToCsv(records)
+  const filename = `독서기록_${new Date().toISOString().slice(0, 10)}.csv`
+
+  const { Capacitor } = await import('@capacitor/core')
+  if (Capacitor.isNativePlatform()) {
+    // 안드로이드: <a download>가 동작하지 않으므로 파일로 저장 후 공유 시트로 내보냄
+    const { Filesystem, Directory, Encoding } = await import('@capacitor/filesystem')
+    const { Share } = await import('@capacitor/share')
+    const res = await Filesystem.writeFile({
+      path: filename,
+      data: csv,
+      directory: Directory.Cache,
+      encoding: Encoding.UTF8,
+    })
+    await Share.share({
+      title: filename,
+      text: '독서기록 CSV 내보내기',
+      url: res.uri,
+      dialogTitle: 'CSV 내보내기',
+    })
+    return
+  }
+
+  // 웹(크롬): 일반 다운로드
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `독서기록_${new Date().toISOString().slice(0, 10)}.csv`
+  a.download = filename
   a.click()
   URL.revokeObjectURL(url)
 }

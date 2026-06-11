@@ -1,23 +1,29 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
-import { THEME_PALETTES, DEFAULT_THEME_ID, THEME_KEY, applyTheme } from './theme'
+import { type AppTheme, DEFAULT_THEME, applyTheme, loadTheme, saveTheme } from './theme'
 
 export function useTheme() {
-  const [themeId, setThemeId] = useState(DEFAULT_THEME_ID)
+  const [theme, setTheme] = useState<AppTheme>(DEFAULT_THEME)
 
   useEffect(() => {
-    try {
-      const v = window.localStorage.getItem(THEME_KEY)
-      if (v) setThemeId(v)
-    } catch {}
+    setTheme(loadTheme())
   }, [])
 
-  const select = useCallback((id: string) => {
-    setThemeId(id)
-    try { window.localStorage.setItem(THEME_KEY, id) } catch {}
-    applyTheme(id)
+  const update = useCallback((patch: Partial<AppTheme>) => {
+    setTheme((cur) => {
+      const next = { ...cur, ...patch }
+      saveTheme(next)
+      applyTheme(next)
+      return next
+    })
   }, [])
 
-  return { themeId, select, palettes: THEME_PALETTES }
+  const reset = useCallback(() => {
+    setTheme(DEFAULT_THEME)
+    saveTheme(DEFAULT_THEME)
+    applyTheme(DEFAULT_THEME)
+  }, [])
+
+  return { theme, update, reset }
 }

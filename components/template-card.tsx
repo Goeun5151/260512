@@ -32,7 +32,9 @@ function typeStyle(s: TextStyle, fontCqw: number): CSSProperties {
 }
 
 type Props = {
-  record: Pick<BookRecord, 'sentence' | 'bookTitle' | 'author' | 'chapter' | 'page' | 'cover'>
+  record: Pick<BookRecord, 'sentence' | 'bookTitle' | 'author' | 'chapter' | 'page' | 'cover'> & {
+    backgroundImage?: string
+  }
   template: Template
   innerRef?: (el: HTMLDivElement | null) => void
 }
@@ -45,6 +47,8 @@ export function TemplateCard({ record, template: t, innerRef }: Props) {
   if (t.showChapter && record.chapter) metaParts.push(record.chapter)
   if (t.showPage && record.page) metaParts.push(`p.${record.page}`)
   const meta = metaParts.join('  ·  ')
+  // 기록 전용 배경 사진이 있으면 템플릿 배경보다 우선
+  const bgImage = record.backgroundImage || t.backgroundImage
 
   return (
     <div
@@ -53,8 +57,8 @@ export function TemplateCard({ record, template: t, innerRef }: Props) {
       style={{ aspectRatio: '6 / 9', background: t.background, containerType: 'inline-size' }}
     >
       {/* background image (사용자 사진) */}
-      {t.backgroundImage ? (
-        <img src={t.backgroundImage} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover" />
+      {bgImage ? (
+        <img src={bgImage} alt="" className="pointer-events-none absolute inset-0 h-full w-full object-cover" />
       ) : null}
 
       {/* cover — always portrait (2:3) */}
@@ -92,7 +96,7 @@ export function TemplateCard({ record, template: t, innerRef }: Props) {
             “
           </span>
         ) : null}
-        <p style={typeStyle(t.sentence, 3.4)}>{record.sentence}</p>
+        <p style={{ ...typeStyle(t.sentence, 3.4), whiteSpace: 'pre-line' }}>{record.sentence}</p>
       </div>
 
       {title ? <p style={{ ...posStyle(t.title), ...typeStyle(t.title, 2.1) }}>{title}</p> : null}

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { BookOpen, X, ScanText } from 'lucide-react'
+import { BookOpen, X, ScanText, Image as ImageIcon } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -16,9 +16,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { BookSearch } from '@/components/book-search'
 import { OcrDialog } from '@/components/ocr-dialog'
-import { TemplateCard } from '@/components/template-card'
 import { useTags } from '@/lib/use-tags'
 import { useTemplates, useSelectedTemplate } from '@/lib/use-templates'
+import { fileToDataUrl } from '@/lib/image'
 import { cn } from '@/lib/utils'
 import type { BookRecord, BookSearchResult } from '@/lib/types'
 
@@ -39,6 +39,7 @@ type Props = {
     tags: string[]
     visibility: 'private' | 'public'
     templateId: string
+    backgroundImage: string
     date: string // YYYY-MM-DD
   }) => void
 }
@@ -66,6 +67,7 @@ const empty = {
   tags: [] as string[],
   visibility: 'private' as 'private' | 'public',
   templateId: '',
+  backgroundImage: '',
   date: '',
 }
 
@@ -103,6 +105,7 @@ export function RecordFormDialog({
               tags: initial.tags ?? [],
               visibility: initial.visibility ?? 'private',
               templateId: initial.templateId ?? defaultTemplateId,
+              backgroundImage: initial.backgroundImage ?? '',
               date: tsToDateStr(initial.createdAt),
             }
           : { ...empty, templateId: defaultTemplateId, date: todayStr() },
@@ -148,7 +151,9 @@ export function RecordFormDialog({
         <div className="space-y-5 px-6 py-5">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="sentence">책 속 문장</Label>
+              <Label htmlFor="sentence">
+                책 속 문장 <span className="text-xs text-red-500">*</span>
+              </Label>
               <button
                 type="button"
                 onClick={() => setOcrOpen(true)}
@@ -202,10 +207,34 @@ export function RecordFormDialog({
           ) : null}
 
           <div className="space-y-2">
-            <Label>템플릿</Label>
-            <p className="text-[11px] text-muted-foreground">
-              카드 디자인을 골라요. 내 사진 배경 템플릿이면 일기처럼 쓸 수 있어요.
-            </p>
+            <div className="flex items-center justify-between gap-2">
+              <Label>템플릿</Label>
+              <div className="flex items-center gap-1.5">
+                <label className="inline-flex cursor-pointer items-center gap-1 rounded-md border bg-background px-2.5 py-1.5 text-xs hover:bg-accent">
+                  <ImageIcon className="size-3.5" />
+                  배경 사진
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      if (file) set('backgroundImage', await fileToDataUrl(file))
+                      e.target.value = ''
+                    }}
+                  />
+                </label>
+                {form.backgroundImage ? (
+                  <button
+                    type="button"
+                    onClick={() => set('backgroundImage', '')}
+                    className="rounded-md border bg-background px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    사진 지우기
+                  </button>
+                ) : null}
+              </div>
+            </div>
             <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
               {templates.map((tpl) => (
                 <button
@@ -213,29 +242,19 @@ export function RecordFormDialog({
                   type="button"
                   onClick={() => set('templateId', tpl.id)}
                   className={cn(
-                    'flex-shrink-0 overflow-hidden rounded-lg border-2 transition-transform',
-                    form.templateId === tpl.id ? 'border-primary scale-[1.03]' : 'border-transparent opacity-80',
+                    'flex-shrink-0 rounded-lg border px-3 py-2 text-sm transition-colors',
+                    form.templateId === tpl.id
+                      ? 'border-primary bg-primary text-primary-foreground'
+                      : 'bg-background text-muted-foreground hover:text-foreground',
                   )}
                 >
-                  <div className="w-16">
-                    <TemplateCard
-                      record={{
-                        sentence: form.sentence || '미리보기 문장',
-                        bookTitle: form.bookTitle,
-                        author: form.author,
-                        chapter: form.chapter,
-                        page: form.page,
-                        cover: form.cover,
-                      }}
-                      template={tpl}
-                    />
-                  </div>
-                  <span className="block bg-background py-0.5 text-center text-[10px] text-muted-foreground">
-                    {tpl.name}
-                  </span>
+                  {tpl.name}
                 </button>
               ))}
             </div>
+            {form.backgroundImage ? (
+              <p className="text-[11px] text-muted-foreground">배경 사진이 적용돼요. (일기처럼 쓸 수 있어요)</p>
+            ) : null}
           </div>
 
           <div className="space-y-2">
@@ -393,6 +412,7 @@ export function RecordFormDialog({
                 tags: form.tags,
                 visibility: form.visibility,
                 templateId: form.templateId,
+                backgroundImage: form.backgroundImage,
                 date: form.date,
               })
             }}

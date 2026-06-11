@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Capacitor } from '@capacitor/core'
 import { Plus, Settings } from 'lucide-react'
@@ -17,6 +17,7 @@ import { LibraryView } from '@/components/library-view'
 import { SharedView } from '@/components/shared-view'
 import { publishShared, type SharedQuote } from '@/lib/use-shared'
 import { downloadCsv } from '@/lib/export'
+import { csvToRecords, readFileText } from '@/lib/import-csv'
 import { AdBanner } from '@/components/ad-banner'
 import { RecordFormDialog } from '@/components/record-form-dialog'
 import { RecordDetailDialog } from '@/components/record-detail-dialog'
@@ -43,6 +44,7 @@ export default function Page() {
   const [editing, setEditing] = useState<BookRecord | null>(null)
   const [selected, setSelected] = useState<BookRecord | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
+  const csvInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     setIsNative(Capacitor.isNativePlatform())
@@ -82,6 +84,7 @@ export default function Page() {
     tags: string[]
     visibility: 'private' | 'public'
     templateId: string
+    backgroundImage: string
     date: string
   }) {
     const { date, ...rest } = data
@@ -99,6 +102,18 @@ export default function Page() {
     }
     setFormOpen(false)
     setEditing(null)
+  }
+
+  async function handleImportCsv(file: File) {
+    try {
+      const text = await readFileText(file)
+      const rows = csvToRecords(text)
+      if (rows.length === 0) { toast.error('가져올 기록이 없어요. (CSV 형식 확인)'); return }
+      for (const r of rows) addRecord(r)
+      toast.success(`${rows.length}개의 기록을 가져왔어요.`)
+    } catch {
+      toast.error('CSV 가져오기에 실패했어요.')
+    }
   }
 
   function importShared(q: SharedQuote) {
@@ -130,8 +145,9 @@ export default function Page() {
             >
               <Settings className="size-5" />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-28">
-              <DropdownMenuItem onClick={() => router.push('/settings')}>설정</DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-32">
+              <DropdownMenuItem onClick={() => router.push('/settings')}>템플릿</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/settings/theme')}>테마</DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/settings/tags')}>태그</DropdownMenuItem>
               <DropdownMenuItem
                 onClick={async () => {
@@ -145,6 +161,9 @@ export default function Page() {
                 }}
               >
                 내보내기(CSV)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => csvInputRef.current?.click()}>
+                가져오기(CSV)
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -194,6 +213,18 @@ export default function Page() {
       </Button>
 
       {isNative && <AdBanner />}
+
+      <input
+        ref={csvInputRef}
+        type="file"
+        accept=".csv,text/csv"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0]
+          if (f) handleImportCsv(f)
+          e.target.value = ''
+        }}
+      />
 
       <RecordFormDialog
         open={formOpen}

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Toaster } from '@/components/ui/sonner'
+import { ThemeApplier } from '@/components/theme-applier'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -23,6 +24,7 @@ export default function RootLayout({
   return (
     <html lang="ko" className="bg-background">
       <body className="font-sans antialiased">
+        <ThemeApplier />
         {children}
         <Toaster position="top-center" />
       </body>

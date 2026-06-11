@@ -7,6 +7,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
 import { TemplateCard } from '@/components/template-card'
+import { ColorPicker } from '@/components/color-picker'
 import {
   BG_SWATCHES, TEXT_SWATCHES, FONT_OPTIONS, DEFAULT_BG_IMAGES,
   type AlignKey, type FontKey, type Template, type TextStyle, type TitleFormat,
@@ -234,7 +235,6 @@ function CheckChip({ label, checked, onClick }: { label: string; checked: boolea
 }
 
 function Swatches({ values, current, onPick }: { values: string[]; current: string; onPick: (c: string) => void }) {
-  const isPreset = values.some((c) => c.toLowerCase() === current.toLowerCase())
   return (
     <div className="flex flex-wrap items-center gap-2">
       {values.map((c) => (
@@ -250,26 +250,8 @@ function Swatches({ values, current, onPick }: { values: string[]; current: stri
           style={{ background: c }}
         />
       ))}
-      {/* 커스텀 컬러 (원하는 색 아무거나) */}
-      <label
-        className={cn(
-          'relative size-7 cursor-pointer overflow-hidden rounded-full border-2',
-          !isPreset ? 'border-foreground scale-110' : 'border-border',
-        )}
-        style={{
-          background: !isPreset
-            ? current
-            : 'conic-gradient(#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)',
-        }}
-        aria-label="커스텀 색상"
-      >
-        <input
-          type="color"
-          value={current}
-          onChange={(e) => onPick(e.target.value)}
-          className="absolute inset-0 cursor-pointer opacity-0"
-        />
-      </label>
+      {/* 커스텀 컬러 — 바로 스펙트럼 슬라이더가 열림 */}
+      <ColorPicker value={current} onChange={onPick} />
     </div>
   )
 }

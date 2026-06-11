@@ -81,12 +81,17 @@ export default function Page() {
     cover: string
     tags: string[]
     visibility: 'private' | 'public'
+    templateId: string
+    date: string
   }) {
+    const { date, ...rest } = data
+    // 날짜(YYYY-MM-DD)를 그날 정오 타임스탬프로 (타임존 경계 일자 밀림 방지)
+    const createdAt = date ? new Date(`${date}T12:00:00`).getTime() : Date.now()
     if (editing) {
-      updateRecord(editing.id, data)
+      updateRecord(editing.id, { ...rest, createdAt })
       toast.success('기록을 수정했어요.')
     } else {
-      addRecord(data)
+      addRecord({ ...rest, createdAt })
       toast.success(data.visibility === 'public' ? '한 줄을 기록하고 공유했어요.' : '한 줄을 기록했어요.')
     }
     if (data.visibility === 'public') {
@@ -126,7 +131,7 @@ export default function Page() {
               <Settings className="size-5" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-28">
-              <DropdownMenuItem onClick={() => router.push('/settings')}>템플릿</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/settings')}>설정</DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/settings/tags')}>태그</DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {

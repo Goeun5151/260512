@@ -16,7 +16,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { BookSearch } from '@/components/book-search'
 import { OcrDialog } from '@/components/ocr-dialog'
+import { TemplateCard } from '@/components/template-card'
 import { useTags } from '@/lib/use-tags'
+import { useTemplates, useSelectedTemplate } from '@/lib/use-templates'
 import { cn } from '@/lib/utils'
 import type { BookRecord, BookSearchResult } from '@/lib/types'
 
@@ -36,7 +38,21 @@ type Props = {
     cover: string
     tags: string[]
     visibility: 'private' | 'public'
+    templateId: string
+    date: string // YYYY-MM-DD
   }) => void
+}
+
+// 로컬 타임존 기준 오늘 날짜 (YYYY-MM-DD)
+function todayStr(): string {
+  const d = new Date()
+  const off = d.getTimezoneOffset() * 60000
+  return new Date(d.getTime() - off).toISOString().slice(0, 10)
+}
+function tsToDateStr(ts: number): string {
+  const d = new Date(ts)
+  const off = d.getTimezoneOffset() * 60000
+  return new Date(d.getTime() - off).toISOString().slice(0, 10)
 }
 
 const empty = {
@@ -49,6 +65,8 @@ const empty = {
   cover: '',
   tags: [] as string[],
   visibility: 'private' as 'private' | 'public',
+  templateId: '',
+  date: '',
 }
 
 export function RecordFormDialog({
@@ -61,6 +79,8 @@ export function RecordFormDialog({
 }: Props) {
   const [form, setForm] = useState(empty)
   const { tags: allTags, addTag } = useTags()
+  const { templates } = useTemplates()
+  const { selectedId: defaultTemplateId } = useSelectedTemplate()
   const [newTag, setNewTag] = useState('')
   const [ocrOpen, setOcrOpen] = useState(false)
 
@@ -82,11 +102,13 @@ export function RecordFormDialog({
               cover: initial.cover,
               tags: initial.tags ?? [],
               visibility: initial.visibility ?? 'private',
+              templateId: initial.templateId ?? defaultTemplateId,
+              date: tsToDateStr(initial.createdAt),
             }
-          : empty,
+          : { ...empty, templateId: defaultTemplateId, date: todayStr() },
       )
     }
-  }, [open, initial])
+  }, [open, initial, defaultTemplateId])
 
   function toggleTag(tag: string) {
     setForm((f) => ({
@@ -178,6 +200,54 @@ export function RecordFormDialog({
               </Button>
             </div>
           ) : null}
+
+          <div className="space-y-2">
+            <Label>템플릿</Label>
+            <p className="text-[11px] text-muted-foreground">
+              카드 디자인을 골라요. 내 사진 배경 템플릿이면 일기처럼 쓸 수 있어요.
+            </p>
+            <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+              {templates.map((tpl) => (
+                <button
+                  key={tpl.id}
+                  type="button"
+                  onClick={() => set('templateId', tpl.id)}
+                  className={cn(
+                    'flex-shrink-0 overflow-hidden rounded-lg border-2 transition-transform',
+                    form.templateId === tpl.id ? 'border-primary scale-[1.03]' : 'border-transparent opacity-80',
+                  )}
+                >
+                  <div className="w-16">
+                    <TemplateCard
+                      record={{
+                        sentence: form.sentence || '미리보기 문장',
+                        bookTitle: form.bookTitle,
+                        author: form.author,
+                        chapter: form.chapter,
+                        page: form.page,
+                        cover: form.cover,
+                      }}
+                      template={tpl}
+                    />
+                  </div>
+                  <span className="block bg-background py-0.5 text-center text-[10px] text-muted-foreground">
+                    {tpl.name}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="date">날짜</Label>
+            <Input
+              id="date"
+              type="date"
+              value={form.date}
+              onChange={(e) => set('date', e.target.value)}
+              className="bg-background"
+            />
+          </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
@@ -322,6 +392,8 @@ export function RecordFormDialog({
                 cover: form.cover,
                 tags: form.tags,
                 visibility: form.visibility,
+                templateId: form.templateId,
+                date: form.date,
               })
             }}
           >

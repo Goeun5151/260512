@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Search, LayoutGrid, List, BookMarked, Library, Heart } from 'lucide-react'
+import { Search, Square, List, BookMarked, Library, Heart } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { useTags } from '@/lib/use-tags'
 import {
@@ -81,11 +81,11 @@ export function LibraryView({ records, onOpen, onToggleFavorite }: Props) {
   function renderCards(items: BookRecord[]) {
     if (view === 'grid') {
       return (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-4">
           {items.map((r) => {
             const tpl = templates.find((t) => t.id === r.templateId) ?? templates[0]
             return (
-              <div key={r.id} className="relative">
+              <div key={r.id} className="relative mx-auto w-full max-w-[16rem]">
                 <button type="button" onClick={() => onOpen(r)} className="block w-full overflow-hidden rounded-xl border">
                   <TemplateCard record={r} template={tpl} />
                 </button>
@@ -148,9 +148,9 @@ export function LibraryView({ records, onOpen, onToggleFavorite }: Props) {
               className={cn('size-8', view === 'list' && 'bg-accent')} onClick={() => setView('list')}>
               <List className="size-4" />
             </Button>
-            <Button variant="ghost" size="icon" aria-label="그리드 보기"
+            <Button variant="ghost" size="icon" aria-label="카드 보기"
               className={cn('size-8', view === 'grid' && 'bg-accent')} onClick={() => setView('grid')}>
-              <LayoutGrid className="size-4" />
+              <Square className="size-4" />
             </Button>
           </div>
         </div>

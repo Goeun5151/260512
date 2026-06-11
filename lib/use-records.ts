@@ -33,7 +33,7 @@ function uid() {
 export type NewRecordInput = Omit<
   BookRecord,
   'id' | 'createdAt' | 'updatedAt' | 'favorite'
-> & { favorite?: boolean }
+> & { favorite?: boolean; createdAt?: number }
 
 export function useRecords() {
   const [records, setRecords] = useState<BookRecord[]>([])
@@ -56,7 +56,7 @@ export function useRecords() {
         id: uid(),
         favorite: false,
         ...input,
-        createdAt: now,
+        createdAt: input.createdAt ?? now, // 사용자가 날짜를 지정하면 그 값 사용
         updatedAt: now,
       }
       persist([record, ...load()])

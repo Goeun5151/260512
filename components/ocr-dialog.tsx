@@ -5,7 +5,7 @@ import { ScanText, ImagePlus, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { recognizeLines } from '@/lib/ocr'
+import { recognizeLines, type OcrEngine } from '@/lib/ocr'
 import { cn } from '@/lib/utils'
 
 type Props = {
@@ -20,9 +20,12 @@ export function OcrDialog({ open, onOpenChange, onInsert }: Props) {
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState(0)
   const [done, setDone] = useState(false)
+  const [engine, setEngine] = useState<OcrEngine | null>(null)
+  const [nativeError, setNativeError] = useState<string | undefined>()
 
   function reset() {
     setLines([]); setSelected(new Set()); setLoading(false); setProgress(0); setDone(false)
+    setEngine(null); setNativeError(undefined)
   }
 
   async function handleFile(file: File) {
@@ -30,8 +33,10 @@ export function OcrDialog({ open, onOpenChange, onInsert }: Props) {
     setLoading(true)
     try {
       const result = await recognizeLines(file, (p) => setProgress(p))
-      setLines(result)
-      setSelected(new Set(result.map((_, i) => i))) // 기본 전체 선택
+      setLines(result.lines)
+      setEngine(result.engine)
+      setNativeError(result.nativeError)
+      setSelected(new Set(result.lines.map((_, i) => i))) // 기본 전체 선택
       setDone(true)
     } catch {
       toast.error('문자 인식에 실패했어요. (첫 실행은 인터넷이 필요해요)')
@@ -92,6 +97,10 @@ export function OcrDialog({ open, onOpenChange, onInsert }: Props) {
             ) : (
               <div className="space-y-1.5">
                 <p className="mb-2 text-xs text-muted-foreground">넣을 줄을 선택하세요.</p>
+                <div className="mb-2 rounded-md bg-muted px-2 py-1 text-[11px] leading-snug text-muted-foreground">
+                  엔진: {engine === 'mlkit-korean' ? 'ML Kit 한국어(네이티브)' : 'Tesseract(웹 폴백)'}
+                  {nativeError ? <span className="block text-amber-700">네이티브 실패: {nativeError}</span> : null}
+                </div>
                 {lines.map((line, i) => (
                   <button
                     key={i}

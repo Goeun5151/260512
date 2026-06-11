@@ -1,22 +1,34 @@
 // 하이브리드 OCR
 // - 폰(네이티브): Google ML Kit 한국어 모델 (한글 정확도 ↑↑) — 직접 만든 KoreanOcr 플러그인
 // - 웹(크롬 미리보기): Tesseract.js (kor) + 흑백/이진화 전처리
+export type OcrEngine = 'mlkit-korean' | 'tesseract'
+export type OcrResult = {
+  lines: string[]
+  engine: OcrEngine
+  nativeError?: string // 네이티브 시도가 실패해 웹 엔진으로 폴백한 경우의 사유
+}
+
 export async function recognizeLines(
   file: File,
   onProgress?: (p: number) => void,
-): Promise<string[]> {
+): Promise<OcrResult> {
+  let nativeError: string | undefined
+  let isNative = false
   try {
     const { Capacitor } = await import('@capacitor/core')
-    if (Capacitor.isNativePlatform()) {
+    isNative = Capacitor.isNativePlatform()
+    if (isNative) {
       onProgress?.(0.4)
       const lines = await recognizeNative(file)
       onProgress?.(1)
-      return lines
+      return { lines, engine: 'mlkit-korean' }
     }
-  } catch {
-    // 네이티브 모듈 없으면 웹 폴백
+  } catch (e) {
+    // 네이티브 OCR 실패 사유를 숨기지 않고 기록 (조용한 폴백이 문제 원인을 가렸음)
+    nativeError = e instanceof Error ? e.message : String(e)
   }
-  return recognizeTesseract(file, onProgress)
+  const lines = await recognizeTesseract(file, onProgress)
+  return { lines, engine: 'tesseract', nativeError: isNative ? (nativeError ?? '네이티브 결과 없음') : nativeError }
 }
 
 // ── 네이티브: ML Kit 한국어 모델 (KoreanOcr 커스텀 플러그인) ──

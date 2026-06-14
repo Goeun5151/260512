@@ -5,7 +5,7 @@ import { ScanText, ImagePlus, Check } from 'lucide-react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { recognizeLines, type OcrEngine } from '@/lib/ocr'
+import { recognizeLines } from '@/lib/ocr'
 import { cn } from '@/lib/utils'
 
 type Props = {
@@ -20,12 +20,9 @@ export function OcrDialog({ open, onOpenChange, onInsert }: Props) {
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState(0)
   const [done, setDone] = useState(false)
-  const [engine, setEngine] = useState<OcrEngine | null>(null)
-  const [nativeError, setNativeError] = useState<string | undefined>()
 
   function reset() {
     setLines([]); setSelected(new Set()); setLoading(false); setProgress(0); setDone(false)
-    setEngine(null); setNativeError(undefined)
   }
 
   async function handleFile(file: File) {
@@ -34,8 +31,6 @@ export function OcrDialog({ open, onOpenChange, onInsert }: Props) {
     try {
       const result = await recognizeLines(file, (p) => setProgress(p))
       setLines(result.lines)
-      setEngine(result.engine)
-      setNativeError(result.nativeError)
       setSelected(new Set(result.lines.map((_, i) => i))) // 기본 전체 선택
       setDone(true)
     } catch {
@@ -51,6 +46,11 @@ export function OcrDialog({ open, onOpenChange, onInsert }: Props) {
       next.has(i) ? next.delete(i) : next.add(i)
       return next
     })
+  }
+
+  const allSelected = lines.length > 0 && selected.size === lines.length
+  function toggleAll() {
+    setSelected(allSelected ? new Set() : new Set(lines.map((_, i) => i)))
   }
 
   function insert() {
@@ -97,10 +97,6 @@ export function OcrDialog({ open, onOpenChange, onInsert }: Props) {
             ) : (
               <div className="space-y-1.5">
                 <p className="mb-2 text-xs text-muted-foreground">넣을 줄을 선택하세요.</p>
-                <div className="mb-2 rounded-md bg-muted px-2 py-1 text-[11px] leading-snug text-muted-foreground">
-                  엔진: {engine === 'mlkit-korean' ? 'ML Kit 한국어(네이티브)' : 'Tesseract(웹 폴백)'}
-                  {nativeError ? <span className="block text-amber-700">네이티브 실패: {nativeError}</span> : null}
-                </div>
                 {lines.map((line, i) => (
                   <button
                     key={i}
@@ -122,7 +118,20 @@ export function OcrDialog({ open, onOpenChange, onInsert }: Props) {
           ) : null}
         </div>
 
-        <div className="flex items-center justify-end gap-2 border-t px-5 py-3">
+        <div className="flex items-center gap-2 border-t px-5 py-3">
+          {done && lines.length > 0 ? (
+            <button
+              type="button"
+              onClick={toggleAll}
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+            >
+              <span className={cn('inline-flex size-4 items-center justify-center rounded border', allSelected ? 'border-primary bg-primary text-primary-foreground' : 'border-current')}>
+                {allSelected ? <Check className="size-3" /> : null}
+              </span>
+              {allSelected ? '전체 해제' : '전체 선택'}
+            </button>
+          ) : null}
+          <div className="flex-1" />
           {done ? (
             <Button variant="ghost" onClick={() => reset()}>다시 선택</Button>
           ) : null}

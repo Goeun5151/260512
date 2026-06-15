@@ -3,6 +3,7 @@
 import type { CSSProperties } from 'react'
 import type { BookRecord } from '@/lib/types'
 import { fontCss, formatTitle, type TextStyle, type Template } from '@/lib/templates'
+import { useResolvedPhoto } from '@/lib/use-photo'
 
 // 카드 안에서의 위치 (요소 중심을 x,y에)
 function posStyle(s: TextStyle): CSSProperties {
@@ -47,8 +48,9 @@ export function TemplateCard({ record, template: t, innerRef }: Props) {
   if (t.showChapter && record.chapter) metaParts.push(record.chapter)
   if (t.showPage && record.page) metaParts.push(`p.${record.page}`)
   const meta = metaParts.join('  ·  ')
-  // 기록 전용 배경 사진이 있으면 템플릿 배경보다 우선
-  const bgImage = record.backgroundImage || t.backgroundImage
+  // 기록 전용 배경 사진(파일 저장소 경로 또는 data URL)이 있으면 템플릿 배경보다 우선
+  const recordBg = useResolvedPhoto(record.backgroundImage)
+  const bgImage = recordBg || t.backgroundImage
 
   return (
     <div

@@ -18,6 +18,7 @@ import { SharedView } from '@/components/shared-view'
 import { publishShared, type SharedQuote } from '@/lib/use-shared'
 import { downloadCsv } from '@/lib/export'
 import { csvToRecords, readFileText } from '@/lib/import-csv'
+import { savePhoto, deletePhoto, isStoredPhoto } from '@/lib/photo-store'
 import { AdBanner } from '@/components/ad-banner'
 import { RecordFormDialog } from '@/components/record-form-dialog'
 import { RecordDetailDialog } from '@/components/record-detail-dialog'
@@ -73,7 +74,7 @@ export default function Page() {
     setDetailOpen(true)
   }
 
-  function handleSubmit(data: {
+  async function handleSubmit(data: {
     sentence: string
     bookTitle: string
     author: string
@@ -90,11 +91,23 @@ export default function Page() {
     const { date, ...rest } = data
     // 날짜(YYYY-MM-DD)를 그날 정오 타임스탬프로 (타임존 경계 일자 밀림 방지)
     const createdAt = date ? new Date(`${date}T12:00:00`).getTime() : Date.now()
+
+    // 새로 고른 배경 사진(data URL)은 파일 저장소에 저장하고 경로만 보관
+    let backgroundImage = rest.backgroundImage
+    if (backgroundImage.startsWith('data:')) {
+      try { backgroundImage = await savePhoto(backgroundImage) } catch { backgroundImage = '' }
+    }
+    // 편집 시 배경이 바뀌었으면 이전 사진 파일 정리
+    if (editing && isStoredPhoto(editing.backgroundImage) && editing.backgroundImage !== backgroundImage) {
+      deletePhoto(editing.backgroundImage)
+    }
+    const payload = { ...rest, backgroundImage, createdAt }
+
     if (editing) {
-      updateRecord(editing.id, { ...rest, createdAt })
+      updateRecord(editing.id, payload)
       toast.success('기록을 수정했어요.')
     } else {
-      addRecord({ ...rest, createdAt })
+      addRecord(payload)
       toast.success(data.visibility === 'public' ? '한 줄을 기록하고 공유했어요.' : '한 줄을 기록했어요.')
     }
     if (data.visibility === 'public') {
@@ -102,6 +115,12 @@ export default function Page() {
     }
     setFormOpen(false)
     setEditing(null)
+  }
+
+  function handleDelete(id: string) {
+    const r = records.find((x) => x.id === id)
+    if (r && isStoredPhoto(r.backgroundImage)) deletePhoto(r.backgroundImage)
+    deleteRecord(id)
   }
 
   async function handleImportCsv(file: File) {
@@ -248,7 +267,7 @@ export default function Page() {
           setEditing(record)
           setFormOpen(true)
         }}
-        onDelete={deleteRecord}
+        onDelete={handleDelete}
         onSelectTemplate={(id, templateId) => updateRecord(id, { templateId })}
       />
     </div>

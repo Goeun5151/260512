@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 11 이하 자동 백업 규칙: 캐시만 제외하고 전부 백업
+     (기록 localStorage = app_webview, 배경 사진 = files 디렉터리 모두 포함) -->
+<full-backup-content>
+    <exclude domain="file" path="cache" />
+</full-backup-content>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ 백업/이전 규칙: 캐시만 제외하고 전부 포함
+     cloud-backup = 구글 드라이브 자동 백업, device-transfer = 기기 간 복사 -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="cache" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="file" path="cache" />
+    </device-transfer>
+</data-extraction-rules>

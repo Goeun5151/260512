@@ -152,9 +152,9 @@ export default function Page() {
       <header className="pt-10 pb-6">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">독서기록</h1>
+            <h1 className="text-2xl font-bold tracking-tight">문장기록</h1>
             <p className="mt-1 text-sm text-muted-foreground">
-              독서로 SNS하세요
+              마음에 닿은 문장을 기록하세요
             </p>
           </div>
           <DropdownMenu>

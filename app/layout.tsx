@@ -4,9 +4,9 @@ import { ThemeApplier } from '@/components/theme-applier'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: '독서기록 — 책 속 문장을 모아두는 곳',
+  title: '문장기록 — 마음에 닿은 문장을 모아두는 곳',
   description:
-    '책 속 마음에 닿은 한 줄을 기록하고, 매일 다시 꺼내 보는 나만의 문장 서재.',
+    '책·일기·영화·명언 속 마음에 닿은 한 줄을 기록하고, 매일 다시 꺼내 보는 나만의 문장 서재.',
   generator: 'v0.app',
 }
 
